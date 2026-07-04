@@ -1,47 +1,30 @@
 # Claude Science Hackathon Learning Plan
 
-Goal: understand where AI is heading in life sciences, with the hackathon as a learning lab rather than a prize competition.
+> **Event:** Built with Claude: Life Sciences (Anthropic + Gladstone Institutes + Cerebral Valley) | **Dates:** July 7-13, 2026 | **Format:** global virtual, week-long | **Tracks:** Lab (Claude Science) and Development (Claude Code) | **My track:** Lab Track — executable runbook in [STEP_BY_STEP.md](./STEP_BY_STEP.md)
 
-## Review Summary
+Goal: use this hackathon as a learning lab (not a prize competition) to understand how frontier AI is applied to scientific research, and to extract reusable architecture patterns for other high-stakes domains: legal, finance, cybersecurity, and autonomous agents. Success = insight gained.
 
-The original plan has the right center of gravity: learn how frontier AI is applied to scientific research, observe how researchers work, and extract reusable engineering patterns. The main refinements are:
+## Phase 0: Logistics (before the event)
 
-- Replace broad curiosity with a staged plan: prepare, observe, build, synthesize.
-- Turn project ideas into decision criteria so the project does not become a generic chatbot or RAG demo.
-- Add concrete questions for researchers, builders, and demos.
-- Add evaluation and verification as first-class topics, because scientific AI is only useful when claims can be trusted.
-- Correct encoding artifacts and remove symbolic noise so the document is easier to reuse.
-
-## Philosophy
-
-This hackathon is not about becoming a biomedical researcher in a few days.
-
-It is about learning how modern AI systems can support scientific work:
-
-- How researchers form questions, find evidence, and decide what is trustworthy.
-- Where deterministic software, retrieval, tools, agents, and human review fit together.
-- Which Claude and Anthropic platform patterns are useful for scientific workflows.
-- Which architecture patterns are reusable in legal AI, finance AI, cybersecurity, and autonomous agents.
-
-Success is measured by insight gained, not by prizes won.
+1. Apply on time: applications close ~July 5. Top 500 applicants get 1 month of Claude Max 20x + $200 API credits.
+2. Access (subscription, not API): confirm Claude Science opens and Claude Code works off your Max subscription; note Max usage windows so you can pace heavy compute. The $200 API credits only matter if you write programmatic API calls.
+3. Environment: open Claude Science and confirm it loads the provided datasets; if using Claude Code, confirm the `bio-research` plugin skills and MCP servers are available. Smoke-test one real query.
+4. Data: the organizers provide real datasets (immune T-cell sequencing, DNA regulatory activity prediction, protein interaction networks) — plan around these, not a self-staged corpus.
+5. Team (virtual): as a non-biologist, find at least one biologist/domain collaborator in the event's online channels. A solo SWE will misframe the biology.
+6. Submission: it is a week-long virtual event — reserve the final day for the reproducible package, a plain-language summary, and a short recorded walkthrough.
 
 ## Learning Objectives
 
-### Primary Objectives
+Each objective ends in a checkable artifact. By event end I have produced all of them.
 
-- Understand the Claude and Anthropic ecosystem for scientific work.
-- Learn common biomedical AI workflows at a practical level.
-- Understand scientific AI agents, tool use, retrieval, and verification loops.
-- Observe how scientists and builders use AI in production or near-production settings.
-- Identify reusable engineering patterns for other high-stakes domains.
-
-### Secondary Objectives
-
-- Meet researchers and technical builders.
-- Learn enough biology vocabulary to follow conversations.
-- Explore real scientific datasets and databases.
-- Experiment with new AI tooling.
-- Build a small project that teaches something concrete.
+1. Agent vs. pipeline judgment: a one-paragraph written answer to "why does this system need an agent/verification loop instead of a deterministic pipeline?", grounded in >=2 demos I actually saw.
+2. Biology fluency: a running glossary with >=20 terms I can define in one sentence without lookup.
+3. Database tooling: the completed Day-3 MCP tool-drill table (6 tools: PubMed, Consensus, ChEMBL, ClinicalTrials.gov, bioRxiv, Open Targets).
+4. Scientific AI workflows: the annotated scientific-work chain (Phase 3) marking where AI is deployed today vs. not trusted.
+5. Observed architectures: filled-in Observation Checklist for >=3 demos/teams.
+6. My own build: a working, reproducible deliverable for my track (Lab: an analysis answering one biological question; Development: the Evidence Comparison Agent) plus a completed self-evaluation.
+7. Reusable patterns: a Pattern Catalog of 3-5 rows, each mapped to legal / finance / cyber / agents.
+8. Networking: >=1 substantive conversation with a working scientist and >=1 with an AI builder, each captured as a follow-up contact.
 
 ## Operating Principles
 
@@ -50,98 +33,89 @@ Success is measured by insight gained, not by prizes won.
 - Treat citations, provenance, and uncertainty as product requirements.
 - Ask why a system was designed a certain way, not only what it does.
 - Optimize for reusable patterns, not domain trivia.
-- Keep a daily record of surprising assumptions, useful architectures, and open questions.
+- Do not ingest patient-identifiable or restricted data into external model calls; confirm any provided dataset's license and de-identification status before use.
+- Treat generative bio content with a do-no-harm filter: synthesize published evidence, do not propose novel harmful protocols, and frame any experiment-suggestion output as decision support requiring expert review.
 
-## Phase 1: Pre-Hackathon Preparation
+## Phase 1: Preparation
 
-Target time: 8 to 12 focused hours.
+Budget: 12 focused hours, tilted toward tooling (that is where reusable architecture insight comes from).
 
-### Biomedical Crash Course
+- Bio crash course: 3h (Days 1-2 compressed into one block).
+- AI ecosystem + hands-on MCP database drill (Day 3): 4h.
+- Paper sampling (Phase 2): 3h.
+- Build-environment + logistics setup: 2h.
 
-Goal: become dangerous enough to understand conversations.
+### Biomedical Crash Course (3h)
 
-#### Day 1: Biology Basics
+Goal: become dangerous enough to follow conversations. You are not becoming a biologist.
 
-Learn:
+Core vocabulary:
 
-- DNA
-- RNA
-- Proteins
-- Genes
-- Cells
-- Mutation
-- Central dogma: DNA -> RNA -> protein
+- DNA, RNA, proteins, genes, cells.
+- Mutation / variant (modern usage prefers "variant"; e.g. SNP, indel).
+- Central dogma: DNA -> RNA -> protein (with known exceptions: reverse transcription in retroviruses, functional non-coding RNAs -- do not state it as absolute).
+- Drug discovery pipeline; protein structures; literature reviews; reproducibility and evidence quality.
+- Clinical trial phases: Phase 1 (safety/dose, tens), Phase 2 (efficacy signal, hundreds), Phase 3 (confirmatory vs standard of care, hundreds-thousands, basis for approval), Phase 4 (post-market). Approval != completing Phase 3 -- a regulator must still act.
+- Biomarkers: a measurable indicator; distinguish prognostic (predicts outcome regardless of treatment) vs predictive (predicts response to a treatment) vs surrogate endpoint (a biomarker standing in for a clinical outcome -- often contested).
 
-Suggested resources:
+Resources if needed: Crash Course Biology, Khan Academy, short visual explainers for protein structure and gene expression. Skim; do not study.
 
-- Crash Course Biology
-- Khan Academy biology modules
-- Short visual explainers for protein structure and gene expression
+### AI Ecosystem Preparation + MCP Database Drill (4h)
 
-Timebox: 2 hours.
+#### Claude primitives, tied to a build decision
 
-#### Day 2: Biomedical Research Workflow
+Review each primitive as a decision for the citation-grounded build, not as a generic topic:
 
-Learn:
+- Tool use / MCP: the 6 bio MCP servers are your retrieval layer.
+- Subagents: one lightweight subagent per paper for extraction, main loop for synthesis (parallelism + cost).
+- Long context + prompt caching: load 5-8 full papers once, cache the prefix, ask many questions cheaply.
+- Extended/adaptive thinking: for the contradiction-detection step.
+- Structured outputs: force per-paper extraction into a fixed schema so the report is not free text.
+- Server-side web_search / web_fetch: for sources with no MCP server.
+- Open Targets is essentially a production knowledge-graph of target-disease-drug evidence -- query it as a live GraphRAG example before reading about GraphRAG abstractly.
 
-- Drug discovery pipeline
-- Clinical trial phases
-- Biomarkers
-- Protein structures
-- Literature reviews
-- Reproducibility and evidence quality
+Confirm current Anthropic feature names/availability against the docs the week of the event -- names and limits change. (Computer use is out of scope; GraphRAG is relevant only to the rejected Option 2.)
 
-Timebox: 2 hours.
+#### Working answer to the agent-vs-pipeline question (refine at the event)
 
-#### Day 3: Scientific Databases
+A deterministic pipeline wins when the schema is fixed and inputs are clean: SQL over ClinicalTrials.gov fields, exact-match ID lookups in ChEMBL. The LLM/agent earns its place only where you need:
 
-Learn what each resource stores and why scientists use it:
+- (a) normalization across heterogeneous free text (matching a claim in paper A to a differently-worded contradicting claim in paper B);
+- (b) open-ended tool routing (deciding whether a question needs PubMed vs ChEMBL vs trials without hardcoding);
+- (c) synthesis with provenance (a claim plus its source span).
 
-- PubMed: biomedical literature
-- PubMed Central: full-text biomedical papers where available
-- UniProt: protein sequence and function
-- Protein Data Bank: 3D protein structures
-- ChEMBL: bioactive molecules and drug discovery data
-- ClinicalTrials.gov: clinical trial records
+If a step is none of these, keep it deterministic. Reusable rule for legal/finance/cyber: LLM at the fuzzy edges, deterministic code in the middle, human at the sign-off. Treat this as a hypothesis to validate against the demos.
 
-Timebox: 2 hours.
+#### Day 3: MCP Database Drill (hands-on)
 
-### AI Ecosystem Preparation
+These databases are live in your Claude Code session as MCP servers -- do not read about them, query them. Run one real query against each and log (a) an example call, (b) the fields it returns, (c) whether it returns full text or metadata + provenance/citation fields, (d) one limitation.
 
-Read or review:
+1. PubMed / PubMed Central: `search_articles` + `get_full_text_article` on a hackathon-theme term.
+2. Consensus: `search` the same question; compare its synthesized, cited answer vs raw PubMed hits.
+3. ChEMBL: `compound_search` + `get_mechanism` for a known drug (e.g. imatinib). Key quantities: potency (IC50/Ki/EC50 -- lower = more potent), mechanism of action, ADMET. The MCP here is ChEMBL v34; public release moves (v35+), so never hardcode a version.
+4. ClinicalTrials.gov: `search_trials` + `get_trial_details` / `analyze_endpoints` for one condition.
+5. bioRxiv/medRxiv: `search_preprints` by category + date for recent theme preprints.
+6. Open Targets: `search_entities` + one `query_open_targets_graphql` for a gene-disease association.
 
-- Claude API basics
-- Tool use
-- MCP
-- Long context workflows
-- Computer use
-- Agent skills and agentic orchestration
-- Retrieval-augmented generation
-- GraphRAG and knowledge graphs
+Deliverable: a half-page table of tool / example call / returned fields / one gotcha. This IS the retrieval layer for your build -- you are testing your tools, not studying reference material.
 
-Core question: why would a scientific AI system need Claude or an agent instead of a traditional pipeline?
+Reference-only (no MCP tool in this environment): UniProt (protein sequence/function, uniprot.org) and PDB (3D structures, rcsb.org). Skip unless the theme is structural biology.
 
-## Phase 2: Research Paper Sampling
+## Phase 2: Research Paper Sampling (3h)
 
-Do not try to master the literature. Learn the workflow and vocabulary.
+Do not master the literature. Aim for fluency + one reusable architecture idea.
 
-Read:
+Read 6 papers, timeboxed to 3 hours total:
 
-- 5 review papers
-- 5 AI-for-science papers
-- 5 biology or biomedical papers related to the hackathon theme
+- 2 review papers (skim for vocabulary).
+- 2 AI-for-science papers (read for architecture / eval).
+- 2 hackathon-theme biology papers.
 
-For each paper, focus on:
+Use the PubMed / Consensus / bioRxiv MCP tools to FIND and triage these papers, and prefer papers you can pull full text for so reading doubles as tool practice.
 
-- Abstract: what problem is being solved?
-- Figures: what evidence is central?
-- Methods: what data and tools were used?
-- Discussion: what are the limitations?
-- References: which papers are treated as important prior work?
+For each paper: abstract (what problem?), figures (central evidence?), methods (data and tools?), discussion (limitations?), references (important prior work?). Skip heavy math unless it affects architecture or evaluation.
 
-Skip heavy mathematical detail at first unless it directly affects architecture or evaluation.
-
-## Phase 3: Mental Model Of Scientific Work
+## Phase 3: Mental Model of Scientific Work
 
 Scientific work usually follows this chain:
 
@@ -159,88 +133,52 @@ Idea
 -> Future research
 ```
 
-For each step, ask:
+This is idealized -- real loops iterate and fail. For this hackathon, mark where AI is deployed today (literature search, hypothesis generation, structure/property prediction, analysis) vs. where it is not trusted (experiment execution, final clinical decisions). The interesting architecture questions live at those boundaries.
 
-- What information is needed?
-- What tools are already used?
-- What is slow, repetitive, or error-prone?
-- What must remain under human control?
-- What would make the output trustworthy?
+For each step, ask: What information is needed? What tools are already used? What is slow, repetitive, or error-prone? What must remain under human control? What would make the output trustworthy?
 
 ## Observation Checklist
 
-Use these questions when watching demos, talking with teams, or evaluating your own project.
+Cap ~15 questions total so it is usable live. Use when watching demos, talking with teams, or evaluating your own build.
 
 ### Architecture
 
-- Why use Claude or an LLM here?
-- Where does deterministic software stop?
-- Where does the LLM begin?
-- Which tasks are fully automated?
-- Which tasks require human approval?
-- Is this a single-agent, multi-agent, or pipeline system?
-- What state, memory, or context is preserved across steps?
+- Why use Claude/an LLM here, and where does deterministic software stop and the LLM begin?
+- Single-agent, multi-agent, or pipeline -- and if subagents, how is the work split?
+- MCP servers or hand-rolled API clients -- why?
 
-### Data
+### Data & Retrieval
 
-- Where does the data come from?
-- Is the data structured, unstructured, multimodal, or mixed?
-- How is the data validated?
-- How noisy or incomplete is it?
-- How are conflicting papers or sources handled?
-- How are hallucinations, stale facts, and weak citations prevented?
-
-### Retrieval
-
-- Is retrieval keyword-based, dense, hybrid, graph-based, or citation-based?
-- Are papers retrieved at the document, section, passage, figure, or table level?
-- Are citations verified against source text?
-- Does the system retrieve negative evidence and contradictions?
-- How are source quality and recency handled?
+- Where does the data come from, and is it structured, unstructured, multimodal, or mixed?
+- Retrieval type: keyword, dense, hybrid, graph, or citation-based -- and at what granularity (doc/section/passage/figure/table)?
+- Are citations verified against source text, and does the system retrieve contradictions/negative evidence?
 
 ### Agent Design
 
-- What tools can the agent use?
-- Does the agent plan before acting?
-- Is there a verification loop?
-- Can it recover from failed tool calls?
-- Can it run long tasks?
-- What gets logged for inspection?
+- What tools can the agent use, and is there a plan step and a verification loop?
+- How did you control token cost over long context -- caching, context editing, or re-retrieval?
 - What should never be delegated to the model?
 
 ### Evaluation
 
-- How is correctness measured?
-- Is the goal precision, recall, coverage, novelty, or speed?
-- Is there a benchmark dataset?
-- Is there human expert review?
-- Are outputs scored for faithfulness and citation accuracy?
-- Does the system expose uncertainty?
+- How is correctness measured (precision, recall, coverage, novelty, speed), and is there a benchmark or expert review?
+- Are outputs scored for faithfulness and citation accuracy, and does the system expose uncertainty?
 
 ### Product
 
-- What problem is actually being solved?
-- Who is the daily user?
-- What existing workflow is being replaced or accelerated?
-- What is the painful manual step?
-- What are the existing alternatives?
-- What would make a scientist trust or reject this tool?
+- What painful manual step is being replaced, who is the daily user, and what are the existing alternatives?
+- What failed, and what was the biggest challenge?
+- What would need to change before a scientist used this seriously?
+
+### Conversation Strategy
+
+Target at least one working scientist and one AI builder. Lead with a specific observation about their demo, not a generic question. Ask scientists what part of their workflow they would never delegate to a model and why -- this surfaces the human-in-the-loop boundary. Capture a contact/follow-up for the strongest conversation.
 
 ## Project Strategy
 
-Avoid building:
+Avoid: another general chatbot; a simple "ask my PDFs" app; generic RAG without a scientific workflow; a demo that cannot explain provenance, uncertainty, or evaluation.
 
-- Another general chatbot.
-- A simple "ask my PDFs" app.
-- Generic RAG without a scientific workflow.
-- A demo that cannot explain provenance, uncertainty, or evaluation.
-
-Prefer building:
-
-- A narrow workflow tool.
-- A system that compares evidence rather than only summarizing it.
-- A tool that exposes contradictions and confidence.
-- A project that teaches a reusable architecture pattern.
+Prefer: a narrow workflow tool; a system that compares evidence rather than only summarizing it; a tool that exposes contradictions and confidence; a project that teaches a reusable architecture pattern.
 
 ### Project Selection Filter
 
@@ -248,224 +186,96 @@ Choose a project only if you can answer yes to most of these:
 
 - Does it solve one clear scientific pain point?
 - Can it be demoed with public or provided data?
-- Can the system show its evidence?
-- Can the output be checked by a human?
+- Can the system show its evidence, and can a human check the output?
 - Does it teach something about Claude, agents, retrieval, or evaluation?
 - Can a narrow version be built during the hackathon?
+- Is the data I plan to use licensed and free of PHI/PII for this use?
 
 ## Candidate Projects
 
-### Option 1: Research Evidence Agent
+> **Track note:** You are targeting the **Lab Track** (analyze the provided datasets with Claude
+> Science) — the executable runbook is [STEP_BY_STEP.md](./STEP_BY_STEP.md). The options below are
+> the **Development Track** alternative (build a tool with Claude Code); keep them as a fallback or
+> a possible second-track idea.
 
-Input: natural language scientific question.
+### Committed default: Evidence Comparison Agent
 
-Workflow:
+One agent, two input modes that share retrieval + extraction plumbing:
 
-```text
-Question
--> Search literature
--> Retrieve relevant evidence
--> Compare papers
--> Identify agreement
--> Identify contradictions
--> Generate evidence report
-```
+- Fixed paper set -> compare directly. **This is the committed hackathon MVP.**
+- Open question -> retrieve-then-compare. **This is the fallback/stretch mode.**
 
-Why it is useful:
+Output: consensus points, contradictions, evidence quality, methods, limitations -- each grounded in a source span.
 
-- Shows retrieval, synthesis, contradiction detection, and citation grounding.
-- Reusable in legal, finance, policy, and cybersecurity research.
+Why: clear demo, easier to evaluate than open-ended generation, strong fit for long context + structured extraction, and it generalizes to legal, finance, policy, and cybersecurity research. Risk: needs a disciplined schema and careful citation verification so the output is not a generic summary. Commit to this build before arriving, not on-site.
 
-Risk:
+Rejected for hackathon scope: **GraphRAG** (graph build too large); **Experiment Planning** (needs expert validation, and experiment suggestions carry a do-no-harm burden).
 
-- Needs careful citation verification to avoid shallow summaries.
+## Recommended Build
 
-### Option 2: Scientific GraphRAG
+### Minimum viable demo (5-8 papers)
 
-Input: paper set or topic.
+- Retrieval: pull 5-8 papers via PubMed `search_articles` + `get_full_text_article` (fall back to bioRxiv `get_preprint` for preprints).
+- Extraction: one subagent per paper with a structured-output schema `{claim, method, dataset, effect_direction, limitation, source_span}`.
+- Cost control: load all papers once into a prompt-cached context.
+- Synthesis: group by consensus vs disagreement on `effect_direction`; each report row links back to the `source_span` its claim came from (citation verification = re-check the span exists in the source).
+- Uncertainty column: flag rows where papers disagree or extraction confidence is low.
 
-Workflow:
+### Go/No-Go and Fallback
 
-```text
-Papers
--> Extract entities
--> Build knowledge graph
--> Link claims to evidence
--> Query graph
--> Generate grounded reasoning
-```
+By ~1/3 of build time I must have papers loading via an MCP and one paper's claims extracted with a working source link. If not, drop to the fallback: a single-paper claim-and-limitation extractor with verified citations (no cross-paper comparison). The core learning goal -- retrieval + structured extraction + citation grounding -- is fully met by the fallback. A working narrow demo beats a broken broad one.
 
-Why it is useful:
+### Self-Evaluation of My Build
 
-- Teaches knowledge representation and graph-based retrieval.
-- Useful when relationships matter more than isolated passages.
+This is a primary insight artifact, not an afterthought:
 
-Risk:
+- (a) Pick 5 papers with a known agreement/disagreement I can verify by hand.
+- (b) Does every extracted claim link to a clickable source passage?
+- (c) Count hallucinated or unsupported claims out of total.
+- (d) Does the uncertainty column actually vary across papers, or is it cosmetic?
+- (e) Would I trust this output enough to cite it?
+- Record the failure modes.
 
-- Graph construction can become too large for a hackathon.
+## Engineering Topics -- study only if it blocks the build
 
-Narrow version:
+Tied to the Evidence Comparison Agent:
 
-- Extract entities and relationships from 5 to 10 papers only.
+- Citation-aware / hybrid retrieval.
+- Claim + contradiction extraction.
+- Faithfulness + citation-accuracy evaluation.
+- Structured-output schema design.
 
-### Option 3: Experiment Planning Assistant
+(Skip ontologies / RDF / OWL / OBO unless a demo makes it relevant. Retrieval and reasoning primitives already covered under AI Ecosystem Preparation.)
 
-Input: research objective.
+## Daily Reflection
 
-Output:
+At day's end, answer three fast questions that roll up into the Pattern Catalog:
 
-- Related papers
-- Existing methods
-- Known limitations
-- Missing knowledge
-- Suggested experiments
-- Risks and assumptions
+1. One surprise.
+2. One pattern worth stealing.
+3. One sharper question for tomorrow.
 
-Why it is useful:
+## Post-Hackathon Synthesis (the single success gate)
 
-- Maps well to real research planning.
-- Forces the system to reason over evidence gaps.
+Success = this Pattern Catalog plus a <=1-page memo within 48h naming the best architecture observed and why, the one most reusable pattern with a concrete mapping to legal OR finance OR cyber, one surprising workflow insight, and the strongest project idea worth continuing.
 
-Risk:
+### Pattern Catalog (target 3-5 rows)
 
-- Experiment suggestions require expert review and should be framed as planning support, not scientific authority.
+Each row uses a fixed schema:
 
-### Option 4: Paper Comparison Agent
+| Pattern name | Problem it solves | Where deterministic code ends / LLM begins | Retrieval strategy | Verification / eval method | Failure mode | Transfer note (legal / finance / cyber / agents) |
+|---|---|---|---|---|---|---|
+| | | | | | | |
 
-Input: 10 to 20 papers.
+### Backlog -- study after the event
 
-Output:
+Deferred until the event surfaces which of these actually matter:
 
-- Consensus points
-- Contradictions
-- Evidence quality
-- Novel findings
-- Methods used
-- Limitations
-
-Why it is useful:
-
-- Clear demo.
-- Easier to evaluate than open-ended research generation.
-- Strong fit for long context and structured extraction.
-
-Risk:
-
-- Needs a disciplined schema so the output does not become a generic summary.
-
-## Recommended Hackathon Build
-
-Best default choice: Paper Comparison Agent.
-
-Reason:
-
-- It is narrow enough for a hackathon.
-- It avoids generic chatbot behavior.
-- It exercises retrieval, long context, structured extraction, and verification.
-- It produces an artifact that scientists can inspect.
-- It generalizes to other high-stakes domains.
-
-Minimum viable demo:
-
-- Upload or select 5 to 10 papers.
-- Extract claims, methods, datasets, and limitations.
-- Group papers by consensus and disagreement.
-- Produce a report with citations back to source passages.
-- Show an uncertainty or evidence-quality column.
-
-## Things To Learn From Other Teams
-
-Ask every demo:
-
-- Why this architecture?
-- Why this model?
-- Why this retrieval strategy?
-- Why not GraphRAG?
-- Why not fine-tuning?
-- Why use agents?
-- What was the biggest challenge?
-- What failed?
-- How did you evaluate correctness?
-- What would need to change before a scientist used this seriously?
-
-## Engineering Topics To Study
-
-### Knowledge Representation
-
-- Knowledge graphs
-- Ontologies
-- OBO Foundry
-- RDF and OWL basics
-- Biomedical entity normalization
-- Metadata design
-
-### Retrieval
-
-- Dense retrieval
-- Sparse retrieval
-- Hybrid search
-- Citation-aware retrieval
-- Scientific search
-- Passage, table, and figure retrieval
-
-### Reasoning
-
-- Multi-step reasoning
-- Tool use
-- Planning
-- Reflection
-- Verification
-- Claim extraction
-- Contradiction detection
-
-### Evaluation
-
-- Hallucination detection
-- Faithfulness
-- Citation accuracy
-- Benchmarking
-- Human evaluation
-- Expert review workflows
-
-## Daily Reflection Template
-
-At the end of each day, answer:
-
-- What surprised me?
-- What assumption was wrong?
-- What architecture did I like?
-- What architecture did I dislike?
-- What would I reuse in my own projects?
-- What term, dataset, or workflow do I still not understand?
-- What is one sharper question to ask tomorrow?
-
-## Success Criteria
-
-By the end of the hackathon, I should be able to explain:
-
-- Why AI is useful in life sciences.
-- How scientists actually use LLMs and AI tools.
-- What Claude or Anthropic tooling does differently from a basic pipeline.
-- Which architectures are reusable outside biology.
-- What production-grade scientific AI needs for trust, evaluation, and review.
-- What ideas I can apply to legal AI, finance AI, cybersecurity, and future autonomous agents.
-
-## Post-Hackathon Synthesis
-
-Within 48 hours after the event, write a short memo:
-
-- Best architecture observed.
-- Most reusable engineering pattern.
-- Most important scientific workflow insight.
-- Best conversation.
-- Strongest project idea worth continuing.
-- One thing to study next.
+- Knowledge representation: knowledge graphs, ontologies, OBO Foundry, RDF/OWL, biomedical entity normalization, metadata design.
+- Retrieval: dense, sparse, hybrid, citation-aware, scientific search, passage/table/figure retrieval.
+- Reasoning: multi-step reasoning, planning, reflection, verification, claim extraction, contradiction detection.
+- Evaluation: hallucination detection, faithfulness, citation accuracy, benchmarking, human/expert review workflows.
 
 ## Final Mindset
 
-I am not attending this hackathon to become a biomedical researcher.
-
-I am attending to observe the next generation of AI systems.
-
-If I leave with one new architecture, one reusable engineering pattern, one meaningful conversation, and one project idea worth pursuing, the hackathon has succeeded.
-
+Leave with one new architecture, one reusable pattern, one meaningful conversation, and one project idea worth pursuing, and the hackathon has succeeded.
