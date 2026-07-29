@@ -1,0 +1,32 @@
+{
+  "output_dir": "C:\\Users\\miqba\\projects\\claude-science-hackathon-learning-plan\\output\\demo",
+  "branch": "donor_aware",
+  "headline_subtype": "terminally_exhausted",
+  "headline_significant": true,
+  "robust": true,
+  "simulated": true,
+  "artifacts": [
+    "C:\\Users\\miqba\\projects\\claude-science-hackathon-learning-plan\\output\\demo\\provenance\\input_audit.json",
+    "C:\\Users\\miqba\\projects\\claude-science-hackathon-learning-plan\\output\\demo\\provenance\\analysis_contract.yaml",
+    "C:\\Users\\miqba\\projects\\claude-science-hackathon-learning-plan\\output\\demo\\tables\\cell_qc_and_gate.csv",
+    "C:\\Users\\miqba\\projects\\claude-science-hackathon-learning-plan\\output\\demo\\figures\\01_qc.png",
+    "C:\\Users\\miqba\\projects\\claude-science-hackathon-learning-plan\\output\\demo\\tables\\cluster_annotation_scores.csv",
+    "C:\\Users\\miqba\\projects\\claude-science-hackathon-learning-plan\\output\\demo\\figures\\02_annotated_cd8_umap.png",
+    "C:\\Users\\miqba\\projects\\claude-science-hackathon-learning-plan\\output\\demo\\provenance\\evidence_used.csv",
+    "C:\\Users\\miqba\\projects\\claude-science-hackathon-learning-plan\\output\\demo\\tables\\donor_exhaustion_statistics.csv",
+    "C:\\Users\\miqba\\projects\\claude-science-hackathon-learning-plan\\output\\demo\\tables\\resolution_robustness.csv",
+    "C:\\Users\\miqba\\projects\\claude-science-hackathon-learning-plan\\output\\demo\\figures\\03_exhaustion_violin.png",
+    "C:\\Users\\miqba\\projects\\claude-science-hackathon-learning-plan\\output\\demo\\figures\\05_resolution_robustness.png",
+    "C:\\Users\\miqba\\projects\\claude-science-hackathon-learning-plan\\output\\demo\\tables\\per_cell_de_exploratory.csv",
+    "C:\\Users\\miqba\\projects\\claude-science-hackathon-learning-plan\\output\\demo\\tables\\pseudobulk_logcpm_sensitivity.csv",
+    "C:\\Users\\miqba\\projects\\claude-science-hackathon-learning-plan\\output\\demo\\tables\\pseudobulk_sample_manifest.csv",
+    "C:\\Users\\miqba\\projects\\claude-science-hackathon-learning-plan\\output\\demo\\tables\\pseudobulk_de_primary.csv",
+    "C:\\Users\\miqba\\projects\\claude-science-hackathon-learning-plan\\output\\demo\\tables\\reviewer_findings.csv",
+    "C:\\Users\\miqba\\projects\\claude-science-hackathon-learning-plan\\output\\demo\\figures\\04_pseudobulk_volcano.png",
+    "C:\\Users\\miqba\\projects\\claude-science-hackathon-learning-plan\\output\\demo\\processed_cd8_analysis.h5ad",
+    "C:\\Users\\miqba\\projects\\claude-science-hackathon-learning-plan\\output\\demo\\methods.md",
+    "C:\\Users\\miqba\\projects\\claude-science-hackathon-learning-plan\\output\\demo\\report.md",
+    "C:\\Users\\miqba\\projects\\claude-science-hackathon-learning-plan\\output\\demo\\three_minute_walkthrough.md",
+    "C:\\Users\\miqba\\projects\\claude-science-hackathon-learning-plan\\output\\demo\\provenance\\manifest.json"
+  ]
+}

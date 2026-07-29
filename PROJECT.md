@@ -1,207 +1,247 @@
-# Project Brief: Verified CD8+ T-cell Exhaustion Triage
+# Project Brief: CD4+ Perturb-seq Source-QC Triage
 
-Lab Track project for **Built with Claude: Life Sciences** (July 7-13, 2026). Companion to the
-[learning plan](./CLAUDE_SCIENCE_HACKATHON_LEARNING_PLAN.md) and the
-[step-by-step runbook](./STEP_BY_STEP.md).
+Lab Track project for
+[Built with Claude: Life Sciences](https://cerebralvalley.ai/e/built-with-claude-life-sciences),
+using the recommended
+[Primary Human CD4+ T Cell Perturb-seq dataset](https://virtualcellmodels.cziscience.com/dataset/genome-scale-tcell-perturb-seq).
 
-**One line:** answer a specific CD8+ T-cell exhaustion question on the provided scRNA-seq data,
-then wrap the analysis in an independent verification loop that reports which hits actually
-survive a stricter, donor-aware recomputation.
+**One line:** turn the authors' public perturbation-level summary statistics into a transparent,
+condition-specific shortlist of CRISPRi perturbations that pass on-target, coverage, off-target,
+cross-donor, and cross-guide source-QC checks.
 
----
+This brief supersedes the original CD8+ exhaustion proposal for the official-data submission. The
+synthetic CD8+ workflow remains a legacy teaching fallback only.
 
-## Intended user and positioning (read this before you build anything)
+## Intended user and decision
 
-Getting this right matters more than any single figure: it decides what you claim, and what a
-scientist or judge will believe.
+The user is a computational biologist or experimental T-cell scientist deciding which candidates
+deserve a closer look before expensive independent experiments. They need to see why each row was
+included, excluded, or ranked highly.
 
-### Who it is for
+The workflow supports this narrow decision:
 
-**The person deciding where to spend expensive experimental effort** — a computational biologist,
-or a wet-lab scientist working alongside one, who has a single-cell dataset and needs to know
-*which few candidates out of many are worth committing wet-lab time to.* They can run a pipeline;
-what they lack is time and a trustworthy way to separate real signal from statistical artifacts.
+> Which perturbations are the most defensible **source-QC candidates** within Rest, Stim8hr, and
+> Stim48hr, and which pass the same gates in all three conditions as **reproducible candidates**?
 
-You are building the **guardrails / trust layer**, not a domain-expert-for-experts. That plays to
-your actual strength (software engineering) and to your meta-goal (a reusable verification pattern
-for legal / finance / cyber), and it is a claim a first-time non-biologist can credibly make.
+It does not discover therapeutic targets automatically. It does not independently recompute the
+authors' differential-expression models from the full cell-level data. It does not replace expert
+review or wet-lab follow-up.
 
-### What it is / what it is NOT
+## Dataset and feasible analysis route
 
-- **It IS:** a reproducible first-pass analysis + a triage tool that ranks candidate hits by
-  whether they survive an independent, stricter recomputation, each with provenance.
-- **It is NOT:** a "hand us your data and trust the hits" black box. It does not replace a
-  computational biologist's judgment; it makes that judgment faster and its inputs auditable.
-- **It is NOT** a discovery engine. The goal is rigor and honesty on a known biological axis
-  (exhaustion), not a novel finding.
+The official dataset contains approximately 22 million primary human CD4+ T cells from four donors
+under three culture conditions:
 
-### What "verified" means here (and why not "validated")
+- `Rest` - resting/unstimulated;
+- `Stim8hr` - stimulation for 8 hours;
+- `Stim48hr` - stimulation for 48 hours.
 
-In biology, **"validated" means orthogonal experimental confirmation** — qPCR, flow cytometry, a
-functional assay. No in-silico pipeline can produce validated hits, and claiming it does is the
-fastest way to lose every scientist in the room.
+The 12 donor-condition cell-level `.h5ad` files total 1,735,835,115,866 bytes, approximately
+1.58 TiB. The project therefore uses the public summary-table route:
 
-This project uses **"verified"** with a precise, narrow definition:
+1. `DE_stats.suppl_table.csv` - 33,983 perturbation-condition rows;
+2. `sample_metadata.suppl_table.csv` - 12 donor-condition sample rows;
+3. `polarization_prediction_condition_comparison_regulator_coefficients.csv` - authors'
+   activation/polarization model coefficients for descriptive annotation;
+4. `IL10_IL21_arrayed_validation.csv` - 53 rows from the authors' small arrayed follow-up.
 
-> A hit is **verified** if it (1) is recomputed with matching sign and adjusted p < 0.05 as
-> **donor-level pseudobulk** DE (the statistically correct unit), AND (2) passes a **literature /
-> target plausibility** check via PubMed + Open Targets.
+This is an intentional scientific and engineering boundary. It makes the analysis reproducible on
+a normal computer while limiting the claim to auditing and prioritizing source-reported results.
+For sources, schemas, sizes, and direct links, read
+[`docs/OFFICIAL_DATASET.md`](./docs/OFFICIAL_DATASET.md).
 
-That is corroboration and triage, not proof. Use the words **verified / corroborated /
-prioritized**; reserve **validated** for the wet lab. Naming this boundary correctly is itself a
-signal that you understand the domain.
+## Scientific question
 
----
+> Within each culture condition, which gene perturbations have broad downstream transcriptional
+> consequences and remain credible after requiring effective negative on-target knockdown,
+> sufficient targeted cells, no author-flagged off-target signal, and positive source-reported
+> cross-donor and cross-guide concordance?
 
-## The science: the specific problem
+The answer consists of:
 
-> **Caveat:** exact dataset fields are unknown until day 1. The Day-1 Data Inspection (below)
-> decides the statistical path and which contrast you run. The problem is designed to adapt.
+1. an auditable gate-by-gate screen funnel;
+2. a ranked table for every eligible perturbation-condition row;
+3. a concise shortlist per condition;
+4. a descriptive weakest-condition ranking among genes that pass every gate in all three
+   conditions;
+5. descriptive source polarization annotations for eligible genes;
+6. a descriptive donor-matched summary of the authors' arrayed IL-10/IL-21 follow-up.
 
-**Question.** In the provided T-cell scRNA-seq data, restricted to CD8+ T cells (CD8A/CD8B+,
-CD4-), is a coordinated **exhaustion module score** (over `PDCD1, HAVCR2, LAG3, TOX, TIGIT,
-ENTPD1`) significantly higher in **condition B than condition A**, and **which annotated CD8+
-subtype** (effector / effector-memory / terminally exhausted) carries the largest up-shift?
+An honest empty shortlist is allowed. The pipeline must not relax a gate merely to produce a
+headline.
 
-**Exact answer.** The single subtype with the largest positive delta in mean exhaustion score
-(B minus A) at FDR < 0.05, plus its top driver genes ranked by pseudobulk log2FC.
+## Pre-registered triage contract
 
-**Answering output (the four figures/tables that constitute the deliverable):**
-1. Annotated CD8+ subtype **UMAP**.
-2. Per-subtype exhaustion-score **violin**, split by condition, with the donor-aware p-value.
-3. Per-subtype **volcano** (B vs A) over the exhaustion panel.
-4. A 4-row **robustness table**: for the headline subtype, does the sign + FDR hold across Leiden
-   resolutions 0.4 / 0.6 / 0.8 / 1.0?
+### Eligibility gates
 
-**Fallback if only one condition exists:** replace the B-vs-A axis with an
-**exhausted-vs-naive/effector** contrast defined by marker thresholds, keeping the identical
-score / stratify / sweep structure.
+Apply these rules to each perturbation-condition row in order and retain the reason for every
+exclusion:
 
----
+| Gate | Exact rule | Why it is required | What it does not prove |
+|---|---|---|---|
+| On-target significance | `ontarget_significant == True` | The source analysis detected target knockdown at its stated 10% FDR rule. | That knockdown is complete, functional, or independently reproduced. |
+| Correct direction | `ontarget_effect_size < 0` | CRISPRi should reduce target expression. | That the size is sufficient for a phenotype. |
+| Off-target flag | `offtarget_flag == False` | Excludes rows the source table flags for a potential off-target issue. | Absence of all off-target biology. |
+| Coverage | `n_cells_target >= 100` | Removes very sparse perturbation-condition estimates. | Equal power across retained rows. |
+| Donor concordance | `crossdonor_correlation_min` is present and `> 0` | Requires measured, directionally positive agreement across the source donor-pair analyses. | An independent recomputation by this project. |
+| Guide concordance | `crossguide_correlation` is present and `> 0` | Requires measured, directionally positive agreement between source guide-level estimates. | That every guide is specific or equally effective. |
 
-## The build arc (near full-time, one week)
+`False`, missing, zero, and negative values must not be silently converted into passes. Gate counts
+must reconcile from the input through the final eligible set.
 
-Two projects that share a dataset, layered so you get all three goals — learn the biology, ship a
-defensible result, and build the reusable pattern.
+### Ranking rule
 
-- **Days 2-4 - the analysis (learn + defensible headline).** Build the CD8+ exhaustion analysis
-  above. This is where you learn to read single-cell output.
-- **Days 5-6 - the verification loop (the reusable pattern + demo differentiator).** Wrap the
-  analysis in a **Reviewer-in-the-Loop**: an independent-recomputation step that takes the top ~30
-  genes a naive per-cell Wilcoxon test calls differential, and audits them via (1) donor-level
-  pseudobulk recomputation, (2) a pseudoreplication delta (how far the per-cell p-value collapses
-  once donors, not cells, are the unit), (3) a PubMed + Open Targets plausibility check.
-  Headline number: **N of 30 per-cell hits that failed donor-level verification.**
+Ranking happens separately within `Rest`, `Stim8hr`, and `Stim48hr`. For eligible rows, compute the
+within-condition percentile rank of these three metrics, where higher is better:
 
-**Requires donor replicates (>= ~4-6 per condition).** If Day 1 shows no donor labels, ship the
-analysis alone with the pseudoreplication caveat stated plainly, and skip the reviewer loop.
+- `n_downstream`;
+- source `crossdonor_correlation_min`, written as `crossdonor_min` in result tables;
+- source `crossguide_correlation`, written as `crossguide` in result tables.
 
----
+Then calculate:
 
-## Day-by-day plan (July 7-13)
+```text
+priority_score = (n_downstream_percentile
+                  * crossdonor_min_percentile
+                  * crossguide_percentile) ** (1/3)
+```
 
-- **Day 1 (Mon) - orient + branch.** Run the Day-1 Data Inspection; commit the statistical path
-  and contrast; QC + one baseline clustering; confirm a CD8+ population separates.
-- **Days 2-4 (Tue-Thu) - analysis.** Gate CD8+, score exhaustion, annotate subtypes with the
-  pre-registered panel, run the condition contrast, build the four deliverable figures + the
-  resolution robustness table. Run the Understand-It Loop on every output.
-- **Days 5-6 (Fri-Sat) - verification loop + interpretation.** Build the reviewer step; produce
-  the verified-findings table; ground survivors in literature; write the biological claim,
-  uncertainty, and limitations.
-- **Day 7 (Sun) - package + submit.** Reproducible bundle, plain-language summary, 3-minute
-  recorded walkthrough.
+Sort by descending `priority_score`, retaining the component metrics and ranks. The geometric mean
+penalizes imbalance: a candidate cannot fully compensate for weak donor concordance with a very
+large downstream-discovery count.
 
----
+### Correct interpretation of the components
 
-## Day-1 Data Inspection (this picks your branch)
+`n_downstream` is the authors' number of downstream genes called significant at **10% FDR** after
+excluding the on-target effect. It is a discovery count, not an effect size. It depends on cell
+count, expression, dispersion, and statistical power; a larger value does not by itself mean a
+larger or more useful biological effect.
 
-Before any analysis, load the data in Claude Science and record:
+`crossdonor_correlation_min` and `crossguide_correlation` are author-reported reproducibility
+summaries. This project checks that they exist, gates on positive values, and uses their relative
+ranks. It does not independently reproduce those correlations from the large donor-pair and
+guide-level matrices.
 
-- [ ] `adata.obs.columns` and `value_counts` on each candidate label column.
-- [ ] **Condition:** are there >= 2 conditions? What are A and B *biologically* (chronic/tumor vs
-      healthy? timepoints? tissues?) - this decides whether a directional exhaustion claim is even
-      justified, or whether you keep it neutral / use the marker fallback.
-- [ ] **Replicates:** do donor / sample / batch IDs exist? -> **pseudobulk primary** if yes;
-      **Wilcoxon-exploratory + pseudoreplication caveat** if no. Cross-tab condition x donor for
-      confounding.
-- [ ] **Genes:** are symbols present (not only Ensembl IDs)? Are `CD8A, CD8B, CD4, PDCD1, HAVCR2,
-      LAG3, TOX, TIGIT, ENTPD1` in `var_names`?
-- [ ] **Write down the committed decision:** statistical path + contrast + whether the reviewer
-      loop is in scope. Pin it where you will see it all week.
+The `priority_score` is a transparent heuristic on a 0-1 relative scale. It is not a calibrated
+probability of success, an FDR, or a therapeutic score.
 
----
+## Arrayed IL-10/IL-21 follow-up
 
-## Pre-registered specs (lock these BEFORE looking at results)
+The authors provide a small file called `IL10_IL21_arrayed_validation.csv`. It contains reported
+IL-10 and IL-21 percentages for nine selected perturbations and non-targeting controls across six
+follow-up donors, with incomplete perturbation coverage across donors.
 
-Locking these prevents post-hoc / cherry-picked conclusions - the thing reviewers attack.
+For each donor and cytokine, the workflow computes the mean of controls whose perturbation label
+starts with `NTC`. Each perturbation value is shown as a donor-matched difference from that control
+mean. It then summarizes available donor deltas without imputing missing perturbations.
 
-- **CD8 gate:** `CD8A` or `CD8B` positive AND `CD4` negative (excludes CD4 and ambient contamination).
-- **Exhaustion panel:** `PDCD1, HAVCR2, LAG3, TOX, TIGIT, ENTPD1`, scored with `sc.tl.score_genes`
-  using control-gene binning.
-- **Subtype marker panel** (label clusters by these, not by eyeballing):
-  - Memory / stem-like: `TCF7, IL7R, SELL, CCR7`
-  - Effector / cytotoxic: `GZMB, PRF1, NKG7, GZMK`
-  - Terminally exhausted: `TOX, PDCD1, HAVCR2, ENTPD1, LAYN`
-- **Statistical unit:** donor-level pseudobulk (aggregate counts per donor x subtype;
-  DESeq2/edgeR-style) is the primary test. Per-cell Wilcoxon is exploratory only.
-- **Robustness:** Leiden resolutions 0.4 / 0.6 / 0.8 / 1.0; headline claim must hold across all four.
-- **Reviewer "verified" rule:** matching sign + pseudobulk adjusted p < 0.05 AND literature/target
-  plausibility.
+This section is **descriptive only**:
 
----
+- no confirmatory p-value is produced;
+- no claim of screen-wide validation is made;
+- missing or uneven donor coverage is shown, not hidden;
+- the reported percentages do not independently establish the broad transcriptional mechanism;
+- the word `validation` in the source filename is not adopted as this project's claim.
 
-## Risks and mitigations
+The safe phrase is: "the candidate has an author-provided arrayed follow-up measurement with the
+following donor-matched descriptive pattern."
 
-- **Pseudoreplication** (per-cell test on a few donors inflates significance). -> Gate the headline
-  on donor pseudobulk; if no donors, flag Wilcoxon as exploratory in plain language.
-- **Condition mismatch** (A/B not exhaustion-relevant). -> Inspect Day 1; keep the marker-defined
-  exhausted-vs-naive fallback; stay neutral about direction unless labels justify it.
-- **Annotation subjectivity** (mislabeling a cluster invalidates the headline). -> Pre-registered
-  marker panel + CD8 gate purity check.
-- **Score confounded by depth / cell cycle.** -> Control-gene binning, QC on counts/mito, confirm
-  the delta survives depth regression, report per-gene log2FC alongside the module score.
-- **Scope creep** (sweep x subtypes x fallback x reviewer). -> Timebox to ONE headline subtype for
-  the deep dive; keep the sweep a compact 4-row table; reviewer loop only if donors exist.
+## Source polarization annotation
 
----
+For genes that pass the source-QC gates, the workflow selects matching rows from the authors'
+`polarization_prediction_condition_comparison_regulator_coefficients.csv`. It retains the source
+coefficient fields and marks whether each regulator appears in the per-condition shortlist or the
+cross-condition candidate set.
 
-## Alternatives and decision rule
+These coefficients come from the authors' prediction models for activation and polarization
+signatures. They provide descriptive biological context only. This project does not refit the
+models, test a new polarization hypothesis, or treat coefficient overlap as independent
+validation.
 
-| Project | Dataset | Pick it if |
-|---|---|---|
-| **Reviewer-in-the-Loop DE** (as the headline, not an add-on) | T-cell scRNA-seq | You want the generator->verifier architecture itself as the trophy AND Day 1 shows >= 4-6 donors/condition. |
-| **PPI disease-module test** (real module vs degree-preserving null) | Protein network | You'd rather do graph analysis or want the purest null-model lesson. |
-| **Leakage-proof enhancer benchmark** (small CNN vs k-mer baseline, chromosome-held-out split) | DNA regulatory | You specifically want a trained-model deliverable and eval rigor as the transferable skill. |
+## Cross-condition analysis
 
-**Rule:** default to the combined arc above. No donor labels -> analysis-only with the marker
-fallback. Want networks -> PPI module. Want a model artifact -> enhancer benchmark. If the
-"wet-lab hands data, trusts output" *product* experience is what you actually want, that is the
-**Development Track** - reconsider the track before July 7, not during.
+Candidate ranks are computed within condition. The cross-condition output retains only genes that
+pass every gate in all three conditions. For each gene it reports the three condition-specific
+scores, their minimum and mean, and the condition with the minimum score. It ranks genes by the
+minimum score so the weakest condition controls the cross-condition order.
 
----
+These differences are **descriptive**. The workflow does not fit a perturbation-by-condition
+interaction model and therefore cannot claim that a perturbation acts significantly more strongly
+in one condition. The sample metadata also needs to remain visible when discussing run/batch
+structure.
 
-## Reusable engineering pattern (the transfer payoff)
+## Required outputs
 
-**Separate a claim from the knobs that produced it, aggregate to the true unit of independence
-before believing a p-value, and let an independent recomputation (not a second opinion) overturn a
-fast first pass.**
+The official run must create an auditable bundle under `output/official/` containing:
 
-- **Legal:** a clause-risk signature re-checked against the source paragraph, robust to chunk size.
-- **Finance:** a fraud-feature shift tested per-account (not per-transaction), recomputed from
-  primary filings.
-- **Cyber:** an attack-behavior signature across host groups, robust to the clustering threshold,
-  confirmed against threat-intel before escalation.
-- **Agents:** self-critique that re-derives a result rather than re-asserting confidence.
+- `provenance/source_audit.json` and `tables/sample_design_summary.csv` - source hashes, schemas,
+  row counts, missingness, donors, conditions, and blockers;
+- `tables/source_qc_decisions.csv` - per-source-row gate decisions and exclusion reasons;
+- `tables/filter_funnel.csv` and `figures/01_filter_funnel.png` - starting rows and remaining rows
+  after each registered gate;
+- `tables/candidate_scores.csv` - all eligible rows, component ranks, `priority_score`, and final
+  rank;
+- `tables/top_candidates_by_condition.csv` and `figures/02_top_candidates.png` - a
+  presentation-sized shortlist without discarding the full table;
+- `tables/cross_condition_candidates.csv` and `figures/03_cross_condition_scores.png` - genes
+  passing source QC in all three conditions, ranked by their minimum condition-specific score;
+- `tables/candidate_polarization_coefficients.csv` - source coefficient annotations for
+  source-QC-pass genes, including shortlist/cross-condition membership flags;
+- `tables/validation_donor_deltas.csv`, `tables/validation_summary.csv`, and
+  `figures/04_arrayed_validation_deltas.png` - donor-matched descriptive follow-up;
+- `report.md`, `methods.md`, `run_summary.json`, and `provenance/manifest.json` - plain-language
+  results, methods, machine-readable summary, and output provenance.
 
----
+## Claim ladder
 
-## Submission checklist
+Use the strongest phrase whose evidence is actually present:
 
-- [ ] Reproducible Claude Science package: code + pinned environment + full message history.
-- [ ] The four deliverable figures/tables (UMAP, exhaustion violin, volcano, robustness table).
-- [ ] Verified-findings table (if reviewer loop in scope): gene | per-cell log2FC & p_adj |
-      pseudobulk log2FC & p_adj | CONFIRMED/REFUTED | citation.
-- [ ] Plain-language write-up: every QC threshold, the pre-registered decisions, the biological
-      claim, and an explicit uncertainty/limitations section.
-- [ ] Correct language throughout: verified / corroborated / prioritized - never "validated".
-- [ ] 3-minute recorded walkthrough.
+1. **Source row:** present in the authors' summary table.
+2. **Eligible row:** passes every registered source-QC gate.
+3. **Prioritized candidate:** ranks highly by the registered geometric-mean score within a
+   condition.
+4. **Reproducible candidate:** passes every source-QC gate in Rest, Stim8hr, and Stim48hr, then is
+   ranked across conditions by its minimum condition-specific score.
+5. **Independently validated:** requires a new, adequately powered orthogonal experiment and is
+   outside this project.
+
+Do not use "verified" or "validated" for levels 1-4.
+
+## Principal limitations
+
+- The main workflow consumes source summaries rather than raw counts.
+- Source DE calls use a 10% FDR threshold; this project does not refit or alter that model.
+- Four screen donors limit population generalization.
+- Positive source correlations can still be small and uncertain.
+- `offtarget_flag == False` means "not flagged by this source field," not "off-target-free."
+- `n_cells_target >= 100` improves minimum coverage but does not equalize power.
+- Percentile ranks are cohort-relative and can change when the candidate universe changes.
+- Cross-condition plots are not formal interaction tests.
+- Polarization coefficients are source-reported descriptive annotations, not an independent test.
+- The small IL-10/IL-21 follow-up is selected, incomplete, and descriptive.
+- No result here demonstrates clinical efficacy, safety, druggability, or causal therapeutic
+  benefit.
+
+## Reusable engineering pattern
+
+The transferable lesson is not a particular gene. It is the architecture:
+
+> Preserve the source result, expose every eligibility gate, rank only among comparable rows,
+> keep the score decomposable, and make the claim no stronger than the recomputation actually
+> performed.
+
+This pattern transfers to evidence triage in legal, finance, cyber, and other scientific domains.
+
+## Legacy teaching project
+
+The deterministic CD8+ exhaustion workflow remains in the repository to teach single-cell
+normalization, UMAP, annotation, donor-level pseudobulk, and pseudoreplication. Its dataset is
+simulated and watermarked. It is not the recommended hackathon dataset and must not appear in the
+official-data claim.
+
+Run it only as a learning fallback:
+
+```powershell
+uv run tcell-triage demo --evidence evidence/literature_evidence.csv
+uv run jupyter lab notebooks/01_cd8_exhaustion_triage_tutorial.ipynb
+```

@@ -1,226 +1,353 @@
-# Step-by-Step: Lab Track Walkthrough (First-Timer)
+# Step by Step: Official CD4+ Perturb-seq Triage
 
-A sequential runbook for **Built with Claude: Life Sciences** (Anthropic + Gladstone Institutes
-+ Cerebral Valley), **July 7-13, 2026, global virtual**. Built for someone new to the domain,
-targeting the **Lab Track** with **near-full-time** availability.
+This is the first-timer runbook for the official
+[Primary Human CD4+ T Cell Perturb-seq dataset](https://virtualcellmodels.cziscience.com/dataset/genome-scale-tcell-perturb-seq)
+recommended by the
+[Built with Claude: Life Sciences](https://cerebralvalley.ai/e/built-with-claude-life-sciences)
+research track.
 
-Your setup: **Claude subscription (Max), not API.** You run everything off the subscription —
-Claude Science (web workbench) and Claude Code. The $200 API credits only matter if you write
-programmatic API calls, which the Lab Track does not require. The limit to respect is Max's
-usage windows, so schedule heavy compute deliberately (see Stage 2).
+The workflow is intentionally lightweight. It analyzes the authors' public summary statistics
+instead of downloading approximately 1.58 TiB of cell-level files. Your job is to understand and
+defend every filter, ranking component, and limitation.
 
-## The one idea that matters for you
+## The learning loop
 
-> **Claude Science can run the entire analysis. Your job is to understand it well enough to
-> defend it.** For the Lab Track, the deliverable is a *reproducible analysis or trained model*
-> that answers a biological question — and the learning (and the credibility) is entirely in the
-> interpretation, not the execution. So the tags below flip the usual hackathon logic: the
-> *running* is delegated, the *understanding* is the manual work you came for.
+Use this loop for every table and figure:
 
-### The Understand-It Loop (do this for EVERY figure/table Claude Science produces)
+1. Read its plain-language description.
+2. Hide the description and explain the artifact aloud in your own words.
+3. Name the input columns and transformation that created it.
+4. State one conclusion it supports.
+5. State one tempting conclusion it does **not** support.
+6. Check one row or point manually against the preceding artifact.
 
-1. Read Claude Science's plain-language description of what it did and why.
-2. Close it. **Restate the result in your own words** without looking. If you can't, you don't
-   understand it yet.
-3. Predict: "if the biology is what I think, this figure should show ___."
-4. Check the figure against your prediction.
-5. If it doesn't match, ask Claude Science *"why?"* and dig until it does.
+Do not move on merely because the output looks polished.
 
-Do not advance to the next step until you've closed this loop on the current output. This loop
-IS the Lab Track learning. Everything else is scaffolding.
+## Stage 0 - Understand the experiment
 
-## How to read the tags
+### 0.1 Read the official sources
 
-- **[AI]** — let Claude Science / Claude Code do it; you review.
-- **[HYBRID]** — AI assists, but the decision or the understanding is yours.
-- **[MANUAL]** — you do it; delegating skips the learning or needs your judgment.
+Open these before running code:
 
-"Ask Claude Science:" and "Ask Claude Code:" lines are copy-paste prompts. Replace `{...}`.
+- [Virtual Cells Platform dataset card](https://virtualcellmodels.cziscience.com/dataset/genome-scale-tcell-perturb-seq)
+- [Authors' data-sharing README](https://github.com/emdann/GWT_perturbseq_analysis_2025/blob/master/metadata/data_sharing_readme.md)
+- [Authors' supplementary tables](https://github.com/emdann/GWT_perturbseq_analysis_2025/tree/master/metadata/suppl_tables)
+- [This repository's dataset guide](./docs/OFFICIAL_DATASET.md)
 
----
+Write these facts from memory:
 
-## Stage 0 — Before July 7 (prep: use July 5-6)
+- cell type: primary human CD4+ T cells;
+- perturbation: genome-scale CRISPR interference, abbreviated CRISPRi;
+- scale: approximately 22 million cells;
+- biological replicates: four donors;
+- conditions: Rest, Stim8hr, and Stim48hr;
+- main source table: 33,983 perturbation-condition rows.
 
-### 0.1 Confirm you're in and tools work — **[MANUAL]**
-- [ ] **Apply if you haven't — applications close ~July 5 (today).** Top 500 get 1 month Claude
-      Max 20x + $200 credits.
-- [ ] Confirm you can open **Claude Science** and that it loads (macOS/Linux, or remote via SSH).
-- [ ] Confirm **Claude Code** works and, if you have it, the `bio-research` plugin skills are
-      available (`/bio-research:start`, `/bio-research:single-cell-rna-qc`, etc.).
-- Why manual: money, credentials, and access. Find dead tools now, not on day one.
+### 0.2 Learn the five essential terms
 
-### 0.2 Biology crash course, aimed at your dataset — **[HYBRID]**
-- [ ] Learn core vocabulary, tilted toward **immunology + single cell** (T cells, immune
-      response, gene expression, cell types).
-- Ask Claude Code: *"You are my biology tutor for a single-cell immunology hackathon. Explain
-  T cells and their subtypes, what single-cell RNA sequencing measures, and what a 'cell type'
-  and a 'marker gene' are — each in 3 sentences at a software-engineer level. Then quiz me."*
-- Do MANUALLY: **write a 20-term glossary in your own words.** Copy-pasting definitions teaches
-  you nothing.
+- **Perturbation:** experimental reduction of a target gene using one or more guide RNAs.
+- **On-target knockdown:** evidence that the intended target gene decreased.
+- **Downstream gene:** another gene whose expression changed after the perturbation.
+- **Cross-donor concordance:** similarity of the estimated perturbation response across donor
+  subsets.
+- **Cross-guide concordance:** similarity of the response estimated using different guides for the
+  same target.
 
-### 0.3 Learn the single-cell pipeline shape — **[HYBRID]** *(this is what lets you read the output)*
-- [ ] Understand the canonical scRNA-seq workflow at a conceptual level, because you must
-      interpret each stage's output:
-  1. **QC** — drop bad cells (low genes, high mitochondrial %). Output: filtering stats.
-  2. **Normalization** — make cells comparable.
-  3. **Dimensionality reduction + clustering** — group similar cells. Output: **UMAP** plot.
-  4. **Cell-type annotation** — label clusters by marker genes. Output: labeled UMAP.
-  5. **Differential expression** — what genes differ between groups. Output: **volcano plot** / gene lists.
-- Ask Claude Code (if you have the plugin): run `/bio-research:single-cell-rna-qc` and
-  `/bio-research:scvi-tools` and read what each stage checks for and why.
-- Do MANUALLY: for each of the 5 stages, write one sentence on **what its output figure means
-  and what "good" looks like.** You will stare at these exact figures all week.
+The last two statistics are supplied by the authors. The summary workflow does not recompute them
+from the full matrices.
 
-### 0.4 Choose dataset + biological question — **[HYBRID] then [MANUAL] decision**
-- **Recommended dataset: immune T-cell sequencing** (single cell). It has the most learnable,
-  best-documented pipeline and interpretable outputs (cell types, marker genes), and Claude
-  Science is pre-configured for single-cell. Alternatives: *DNA regulatory activity prediction*
-  (a "trained model" task — more ML, subtler biology) and *protein interaction networks* (graph
-  analysis) — both harder to interpret as a first-timer.
-- Ask Claude Code (if available): `/bio-research:scientific-problem-selection` to pressure-test
-  candidate questions.
-- Do MANUALLY: **write ONE specific biological question**, e.g. *"Which T-cell subtypes differ
-  between condition A and B, and which marker genes drive that difference?"* A Lab Track
-  submission answers a question; "I analyzed the data" is not a question. This choice is yours.
+### 0.3 Lock the question and claim boundary
 
----
+Copy this question into your notes:
 
-## Stage 1 — Day 1 (Mon Jul 7): Orient
+> Which perturbations produce broad downstream transcriptional effects and pass the registered
+> source-QC checks within each culture condition?
 
-### 1.1 Read the dataset documentation — **[MANUAL]**
-- [ ] Read the data dictionary: what each file/column is, how the data was generated, sample
-      count, and any known caveats the organizers flag.
-- Why manual: **you cannot interpret an output whose input you don't understand.** This is the
-  foundation of the whole week.
+Copy this claim boundary too:
 
-### 1.2 Load and first-look in Claude Science — **[HYBRID]**
-- Ask Claude Science: *"Load this T-cell single-cell dataset. Give me summary stats (cells,
-  genes, samples), a QC overview (genes/cell, mitochondrial %), and flag anything unusual.
-  Show the code you ran."*
-- Do the Understand-It Loop on the QC overview before continuing.
+> A high-ranked condition row is a source-QC candidate. "Reproducible candidate" is reserved for a
+> gene that passes every gate in all three conditions. Neither label means independently verified
+> or experimentally validated.
 
-### 1.3 Lock the question and success criterion — **[MANUAL]**
-- [ ] Write, in one paragraph: the biological question, what a **credible answer** looks like,
-      and how you'd know if the result is wrong. Pin it where you'll see it daily.
-- Why manual: this is your compass. If Claude Science wanders, this pulls it back.
+## Stage 1 - Install and run
 
----
+### 1.1 Prepare the environment
 
-## Stage 2 — Days 2-4 (Tue-Thu): Analyze — AI runs it, you understand it
+From the repository root in Windows PowerShell:
 
-> Pace heavy compute against your Max usage window: kick off the big run, then spend the cooldown
-> doing the Understand-It Loop on what already finished.
+```powershell
+uv sync --extra dev
+```
 
-### 2.1 Run the pipeline — **[AI]**
-- Ask Claude Science: *"Run the standard single-cell workflow to answer my question: QC ->
-  normalization -> clustering -> cell-type annotation -> differential expression between
-  {group A} and {group B}. Produce a figure per stage, keep every artifact reproducible with
-  its code, and use the reviewer agent to check the calculations."*
-- Why AI: this is exactly what Claude Science is built for (end-to-end, reproducible artifacts).
+This installs the pinned environment from `uv.lock`.
 
-### 2.2 Understand every stage's output — **[MANUAL]** *(THE CORE OF YOUR WEEK)*
-- [ ] Run the **Understand-It Loop** on each artifact: QC stats, UMAP, annotated UMAP, volcano
-      plot / DE gene list.
-- [ ] For the annotated UMAP: **pick 2 cell types and name the marker genes that justify the
-      label.** Ask Claude Science *"why is this cluster called a CD8 T cell?"* and check the
-      markers are real (CD8A, etc.).
-- [ ] For the DE result: **pick the top 3 genes and look up what they do** (use the PubMed /
-      Consensus MCP or Claude Science's databases). Can you tell a biological story?
-- Why manual: this is the learning you signed up for. If you skip it, you have an analysis you
-  can't explain — which a Lab Track judge (or any scientist) will see through instantly.
+### 1.2 Run the complete official workflow
 
-### 2.3 Sanity-check and reproduce — **[HYBRID]**
-- [ ] Re-run one stage with a different parameter (e.g. clustering resolution) and see whether
-      your main finding survives. If it flips, your result is fragile — note that.
-- Ask Claude Science: *"Re-run clustering at resolution 0.5 and 1.0 and tell me if my key
-  cell-type difference holds."*
-- Do MANUALLY: **verify one result by hand** — e.g. confirm a claimed marker gene is actually
-  high in that cluster. Don't let the reviewer agent be your only check.
+```powershell
+uv run perturbseq-triage all --data-dir data/official --output-dir output/official
+```
 
-### 2.4 Iterate the question — **[MANUAL]**
-- [ ] Biology is iterative. If the data answered your question or surprised you, sharpen or pivot
-      the question. Record why.
+The command should:
 
----
+1. download the public summary tables;
+2. verify their required columns and study design;
+3. apply the six registered gates;
+4. calculate within-condition percentile ranks and the geometric-mean score;
+5. write full and presentation-sized candidate tables;
+6. join source-reported activation/polarization coefficients as descriptive annotation;
+7. rank genes passing all three conditions by their weakest condition score;
+8. calculate donor-matched IL-10/IL-21 follow-up deltas descriptively;
+9. write figures, report text, and provenance.
 
-## Stage 3 — Days 5-6 (Fri-Sat): Interpret and package
+It should not download any `D*_*.assigned_guide.h5ad` file.
 
-### 3.1 Interpret the biology — **[MANUAL]** *(the heart of the deliverable)*
-- [ ] Write the **biological claim** your analysis supports, in plain language, in your own
-      words. Not "cluster 4 is upregulated" but "T-cell subtype X shifts toward an exhausted
-      state in condition B, driven by genes Y and Z."
-- Why manual: the claim is the point. AI can describe the figure; only you can commit to what it
-  *means* and stake the submission on it.
+### 1.3 Open the official notebook
 
-### 3.2 Ground it in the literature — **[HYBRID]**
-- Ask Claude Code: *"Search PubMed and Consensus: is it known that {my finding} occurs in {my
-  condition}? Give me supporting and contradicting papers with citations."*
-- Do MANUALLY: **decide what's known vs. novel vs. uncertain.** That judgment is yours; the
-  search is the AI's.
+```powershell
+uv run jupyter lab notebooks/02_cd4_perturbseq_official_tutorial.ipynb
+```
 
-### 3.3 Build the reproducibility package — **[AI]**
-- Ask Claude Science: *"Bundle the full analysis: code, environment, and figures, so someone
-  can reproduce it from raw data. Generate a plain-language methods section from the message
-  history."*
-- [ ] **Verify it actually reproduces** — this is your check, not a claim to take on faith.
+Use the notebook to learn the finished outputs. Use the CLI for the clean reproducible run. Both
+should point at the same official summary inputs and implement the same contract.
 
-### 3.4 State uncertainty and limitations — **[MANUAL]**
-- [ ] Write what you are NOT sure about: batch effects, small sample size, parameter
-      sensitivity, annotations you couldn't confirm.
-- Why manual: honest limitations are what make a scientist trust the work. Judges reward it;
-  first-timers usually skip it.
+## Stage 2 - Audit the inputs
 
----
+Open `output/official/provenance/source_audit.json` and
+`output/official/tables/sample_design_summary.csv` first. Confirm:
 
-## Stage 4 — Day 7 (Sun Jul 13): Submit and present
+- the DE table has 33,983 rows before filtering;
+- conditions are exactly `Rest`, `Stim8hr`, and `Stim48hr`;
+- sample metadata represents four unique donors and 12 donor-condition rows;
+- all required columns are present;
+- numeric columns parse as numeric rather than strings;
+- Boolean fields have not silently acquired unexpected categories;
+- missing donor and guide correlations are counted;
+- the local inputs can be traced to exact public URLs.
 
-### 4.1 Plain-language summary — **[HYBRID]**
-- Ask Claude Science: *"Draft a summary of my analysis: question, method, result, biological
-  interpretation, limitations — from the reproducible artifacts and message history."*
-- Do MANUALLY: **rewrite the claims in your voice** and cut anything you can't personally defend.
+Required DE columns are:
 
-### 4.2 Demo / walkthrough recording — **[HYBRID]**
-- Ask Claude Science: *"Draft a 3-minute walkthrough script: the question, the key UMAP and
-  volcano figures, the biological finding, and why it's reproducible."*
-- Do MANUALLY: record it. Practice explaining one figure with no notes — if you can, you've
-  learned it.
+```text
+target_contrast_gene_name
+culture_condition
+n_cells_target
+ontarget_effect_size
+ontarget_significant
+offtarget_flag
+n_downstream
+crossdonor_correlation_min
+crossguide_correlation
+```
 
-### 4.3 Final submission — **[MANUAL]**
-- [ ] Submit the reproducible analysis + summary per the event's requirements. Double-check the
-      package opens and runs from scratch.
+Stop if the schema or conditions differ. Do not rename an unfamiliar column by guesswork.
 
----
+### Manual check
 
-## Stage 5 — After: lock in the learning — **[HYBRID / MANUAL]**
+Pick any three source rows. For each, say whether it should pass the on-target direction and cell
+count gates before looking at the pipeline's result. Then compare your prediction with the audit.
 
-### 5.1 The "can I explain it?" retro — **[MANUAL]**
-- [ ] Success gate for a learning-first Lab Track: **can you now walk someone through the whole
-      pipeline — QC to biological claim — from memory, and defend each choice?** If yes, you met
-      your goal regardless of placement. If a stage is fuzzy, that's your next study target.
+## Stage 3 - Understand the screen funnel
 
-### 5.2 Pattern + insight catalog — **[HYBRID]**
-- Ask Claude Code: *"From my notes, draft a catalog: the analysis pattern I used, where
-  deterministic tooling ended and the AI's judgment began, how results were verified, the
-  failure modes, and how this reproducible-analysis pattern transfers to legal / finance / cyber
-  evidence work."*
-- Do MANUALLY: **the transfer insights and the biology you learned are yours** — edit heavily.
+Open `output/official/tables/source_qc_decisions.csv`,
+`output/official/tables/filter_funnel.csv`, and
+`output/official/figures/01_filter_funnel.png`. The registered gates are:
 
----
+1. `ontarget_significant == True`;
+2. `ontarget_effect_size < 0`;
+3. `offtarget_flag == False`;
+4. `n_cells_target >= 100`;
+5. `crossdonor_correlation_min` is present and greater than zero;
+6. `crossguide_correlation` is present and greater than zero.
 
-## One-glance summary
+Each gate answers a different question. Passing one cannot substitute for failing another.
 
-| Do it yourself (manual) | Let AI drive |
-|---|---|
-| Apply, confirm access, credentials | Load data, run QC and stats |
-| Understand biology; write your glossary | Explain concepts, quiz you |
-| Read the dataset documentation | Run the full single-cell pipeline |
-| Lock the biological question | Produce reproducible artifacts + methods text |
-| **Understand every output (Understand-It Loop)** | Draft plain-language descriptions |
-| Verify a result by hand | Re-run with different parameters |
-| Commit to the biological claim | Search literature for support/contradiction |
-| State uncertainty and limitations | Bundle the reproducibility package |
-| The "can I explain it?" retro | Draft the summary and demo script |
-| Transfer insights to other domains | Structure the pattern catalog |
+### What to verify
 
-Rule of thumb for the Lab Track: **Claude Science runs the experiment; you own the question,
-the interpretation, and the honesty about what you don't know.**
+- counts never increase as the funnel progresses;
+- the final count equals the number of rows in `tables/candidate_scores.csv`;
+- missing correlations fail their respective gates;
+- zero correlations do not pass a strict `> 0` rule;
+- a positive on-target effect does not pass CRISPRi direction even if marked significant;
+- a flagged potential off-target row is excluded.
+
+### What not to say
+
+Do not say "the excluded genes are biologically unimportant." A row can fail because the source
+screen lacked power, a metric was not measured, guide behavior was inconsistent, or the project
+set a conservative minimum. The funnel defines eligibility for this triage, not biological truth.
+
+## Stage 4 - Understand the ranking
+
+Open `output/official/tables/candidate_scores.csv`. Eligible rows are ranked separately within
+each culture condition.
+
+For each row, inspect:
+
+- `n_downstream` and `n_downstream_percentile`;
+- source donor metric `crossdonor_min` and `crossdonor_min_percentile`;
+- source guide metric `crossguide` and `crossguide_percentile`;
+- the geometric-mean `priority_score`;
+- the final within-condition rank.
+
+The score is:
+
+```text
+priority_score = (n_downstream_percentile
+                  * crossdonor_min_percentile
+                  * crossguide_percentile) ** (1/3)
+```
+
+### Why use a geometric mean?
+
+It makes balance matter. A candidate that is excellent on downstream discovery count but weak on
+donor agreement should not look identical to one that is consistently strong across all three
+dimensions.
+
+### The most important warning
+
+`n_downstream` is the number of downstream genes called significant by the authors at 10% FDR,
+excluding the on-target effect. It is affected by cell count and statistical power. It is **not**
+an effect-size measure, and twice as many discoveries does not mean twice the biological effect.
+
+The score is also not a probability. A score of 0.90 does not mean a 90% chance of experimental
+success.
+
+### Manual check
+
+Choose one candidate from the top five in each condition. Recalculate the product of its three
+percentile ranks and take the cube root with a calculator. Confirm the reported score to rounding.
+Then identify its weakest component.
+
+## Stage 5 - Build a defensible shortlist
+
+Open `output/official/tables/top_candidates_by_condition.csv` and
+`output/official/figures/02_top_candidates.png`.
+
+For each shortlisted row, be able to answer:
+
+1. Which condition was it ranked in?
+2. Did it pass all six gates?
+3. How many downstream discoveries did the source report?
+4. What were the minimum donor and guide correlations?
+5. Which component most limits its score?
+6. What independent experiment would you run next?
+
+The shortlist is for presentation. The full `tables/candidate_scores.csv` remains the auditable
+ranked record, while `tables/source_qc_decisions.csv` preserves every source-row decision. Both
+must ship with it.
+
+## Stage 6 - Read the cross-condition view correctly
+
+Open `output/official/tables/cross_condition_candidates.csv` and
+`output/official/figures/03_cross_condition_scores.png`.
+
+The table contains only genes that pass every gate in all three conditions. It shows each
+condition-specific score, the minimum and mean score, the `worst_condition`, and a
+`cross_condition_rank` determined by the minimum score. This rewards a strong weakest condition.
+
+It cannot establish a condition-specific causal effect. The pipeline does not fit a formal
+perturbation-by-condition interaction model. A candidate ranking higher in Stim48hr than Stim8hr
+may reflect the eligible comparison set, power, cell count, or the underlying source statistics.
+
+Use: "passed source QC in all three conditions; its lowest priority score was in Stim48hr."
+
+Do not use: "has a significantly stronger effect after 48 hours."
+
+## Stage 7 - Read the polarization annotation correctly
+
+Open `output/official/tables/candidate_polarization_coefficients.csv`. It contains rows from the authors'
+activation/polarization coefficient table for regulators that also pass this project's source-QC
+gates. Membership flags show whether the regulator appears in a per-condition top list or the
+cross-condition candidate set.
+
+Use this table to add source context, such as which signature and condition a coefficient belongs
+to. Do not call the coefficient a new result from this project: the pipeline does not refit the
+authors' model or run an independent polarization test.
+
+## Stage 8 - Read the IL-10/IL-21 follow-up correctly
+
+Open `output/official/tables/validation_donor_deltas.csv`,
+`output/official/tables/validation_summary.csv`, and
+`output/official/figures/04_arrayed_validation_deltas.png`.
+
+The source file reports `IL10_perc` and `IL21_perc` for selected perturbations and non-targeting
+controls. For each donor, the workflow:
+
+1. identifies control labels beginning with `NTC`;
+2. averages available NTC values for each cytokine;
+3. subtracts that donor-matched control mean from each perturbation value;
+4. summarizes only the observed donor deltas.
+
+A positive delta means the reported percentage was above that donor's NTC mean; a negative delta
+means it was below. Check the number of donors because perturbation coverage is uneven.
+
+This is descriptive. Do not add a p-value after seeing the plot, treat missing donors as zeros, or
+call it independent validation. The authors chose the perturbations in this small follow-up, and
+the filename's word `validation` is not a license to strengthen this project's claim.
+
+## Stage 9 - Write the result in your own words
+
+Use this four-sentence template and replace every bracket:
+
+> We audited 33,983 source-reported perturbation-condition results from a four-donor primary CD4+
+> T-cell CRISPRi screen. After requiring [list the six gates], [N] rows were eligible across the
+> three culture conditions. [Candidate] ranked highly in [condition] because it balanced
+> downstream discovery count with positive author-reported donor and guide concordance. This is a
+> source-QC candidate for independent follow-up, not an independently verified or validated
+> target. If it passes all three conditions, say so before using "reproducible candidate."
+
+If discussing the arrayed file, add a separate sentence that calls it an author-provided,
+donor-matched **descriptive** follow-up.
+
+## Stage 10 - Reproduce and package
+
+Run the checks:
+
+```powershell
+uv run pytest -q
+uv run ruff check src tests scripts
+uv run jupyter nbconvert --to notebook --execute --inplace --ExecutePreprocessor.timeout=600 notebooks/02_cd4_perturbseq_official_tutorial.ipynb
+```
+
+Then complete [`docs/SUBMISSION_CHECKLIST.md`](./docs/SUBMISSION_CHECKLIST.md). Re-run the official
+command from a clean output directory or fresh clone before submission, while preserving the
+downloaded inputs and provenance needed for reproducibility.
+
+## Optional - Explore the full dataset later
+
+The Virtual Cells Platform documents public CLI and S3 access. The discovery command is:
+
+```powershell
+vcp data search "Primary Human CD4+ T Cell Perturb-seq" --exact
+```
+
+Do not start the full download casually. The 12 cell-level files total approximately 1.58 TiB; the
+pseudobulk and DE matrix artifacts are also tens of gigabytes. A full reanalysis needs adequate
+storage, memory, transfer time, and a new statistical plan. It would be a separate extension, not
+a hidden step in this workflow.
+
+## Legacy synthetic learning fallback
+
+If you want to learn UMAP, marker annotation, donor pseudobulk, and per-cell pseudoreplication on a
+small deterministic fixture, use the earlier CD8+ tutorial:
+
+```powershell
+uv run tcell-triage demo --evidence evidence/literature_evidence.csv
+uv run jupyter lab notebooks/01_cd8_exhaustion_triage_tutorial.ipynb
+```
+
+That dataset is simulated. Its injected result is a software test and teaching example, not part
+of the official CD4+ Perturb-seq result.
+
+## Final self-check
+
+You are ready to present only if you can answer these without notes:
+
+1. Why is the official question about CD4+ perturbations rather than CD8+ exhaustion?
+2. Why does the project use summary tables instead of the cell matrices?
+3. Why must significant CRISPRi on-target effects also be negative?
+4. Why do missing donor or guide correlations fail eligibility?
+5. Why is `n_downstream` not an effect size?
+6. What does the geometric mean reward?
+7. Why are condition differences descriptive rather than interaction claims?
+8. Why is the IL-10/IL-21 section descriptive despite the source filename?
+9. What evidence would be needed before saying "validated"?

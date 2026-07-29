@@ -1,0 +1,13 @@
+sample_id,donor,condition,n_cells
+A_donor_01__A,A_donor_01,A,13
+A_donor_02__A,A_donor_02,A,13
+A_donor_03__A,A_donor_03,A,12
+A_donor_04__A,A_donor_04,A,10
+A_donor_05__A,A_donor_05,A,10
+A_donor_06__A,A_donor_06,A,10
+B_donor_01__B,B_donor_01,B,12
+B_donor_02__B,B_donor_02,B,12
+B_donor_03__B,B_donor_03,B,13
+B_donor_04__B,B_donor_04,B,13
+B_donor_05__B,B_donor_05,B,13
+B_donor_06__B,B_donor_06,B,12

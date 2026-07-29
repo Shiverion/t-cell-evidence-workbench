@@ -1,0 +1,17 @@
+# Pre-registered contract for the deterministic teaching dataset.
+input_path: ../data/demo_tcells.h5ad
+output_dir: ../output/demo
+condition_key: condition
+donor_key: donor
+condition_a: A
+condition_b: B
+counts_layer: counts
+seed: 42
+min_donors_per_condition: 4
+resolutions: [0.4, 0.6, 0.8, 1.0]
+qc:
+  min_genes: 10
+  max_genes: 500
+  max_mito_pct: 20.0
+  min_cells_per_gene: 1
+

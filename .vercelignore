@@ -1,0 +1,13 @@
+/.venv
+/configs
+/data
+/docs
+/evidence
+/notebooks
+/output/demo
+/output/ui-*.png
+/scripts
+/src
+/tests
+/web/.analysis-output
+/web/.next

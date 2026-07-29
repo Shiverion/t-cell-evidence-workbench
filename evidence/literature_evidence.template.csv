@@ -1,0 +1,3 @@
+gene,literature_pass,target_pass,citation,pubmed_url,open_targets_url,note,reviewed_date,context_scope
+GENE_SYMBOL,false,false,"Author et al., Journal Year, PMID",https://pubmed.ncbi.nlm.nih.gov/,https://platform.opentargets.org/,"Record what the source supports, what it does not support, and whether the direction/context matches.",YYYY-MM-DD,"species, tissue, disease, treatment, assay"
+

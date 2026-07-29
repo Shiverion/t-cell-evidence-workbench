@@ -1,0 +1,20 @@
+{
+  "branch": "donor_aware",
+  "condition_counts": {
+    "A": 324,
+    "B": 324
+  },
+  "counts_layer": "counts",
+  "donors_per_condition": {
+    "A": 6,
+    "B": 6
+  },
+  "missing_genes": [],
+  "n_cells": 648,
+  "n_genes": 118,
+  "raw_counts_valid": true,
+  "reasons": [
+    "Both configured conditions and sufficient donor replicates are present; donor-level pseudobulk is the primary statistical path."
+  ],
+  "warnings": []
+}

@@ -1,0 +1,93 @@
+# Human-readable analysis contract for the official CD4+ Perturb-seq workflow.
+#
+# The CLI command is:
+#   uv run perturbseq-triage all --data-dir data/official --output-dir output/official
+#
+# The downloader also enforces the pinned URLs, byte lengths, and SHA-256 values in code. Keep this
+# document synchronized with those checks. The current CLI does not require a --config argument.
+
+dataset:
+  name: Primary Human CD4+ T Cell Perturb-seq
+  version: v1.0
+  release_date: 2025-12-22
+  license: MIT
+  approximate_cells: 22000000
+  donors: 4
+  conditions: [Rest, Stim8hr, Stim48hr]
+  dataset_card: https://virtualcellmodels.cziscience.com/dataset/genome-scale-tcell-perturb-seq
+  s3_prefix: s3://genome-scale-tcell-perturb-seq/marson2025_data/
+  github_repository: https://github.com/emdann/GWT_perturbseq_analysis_2025
+  github_commit: 848d62fc2b7027f7218d6fc5f5b0c37255dc94af
+
+sources:
+  de_stats:
+    filename: DE_stats.suppl_table.csv
+    url: https://raw.githubusercontent.com/emdann/GWT_perturbseq_analysis_2025/848d62fc2b7027f7218d6fc5f5b0c37255dc94af/metadata/suppl_tables/DE_stats.suppl_table.csv
+    bytes: 5341369
+    sha256: 66fb80b93ef107095a8218efa06a5b272093d9343e9009b3ea4a88ba3cafdead
+  sample_metadata:
+    filename: sample_metadata.suppl_table.csv
+    url: https://raw.githubusercontent.com/emdann/GWT_perturbseq_analysis_2025/848d62fc2b7027f7218d6fc5f5b0c37255dc94af/metadata/suppl_tables/sample_metadata.suppl_table.csv
+    bytes: 2966
+    sha256: 766134d11dabb5d63388e00b4d687a809c0254eb3c19d77f439a6bf9dad7abd4
+  polarization_coefficients:
+    filename: polarization_prediction_condition_comparison_regulator_coefficients.csv
+    url: https://raw.githubusercontent.com/emdann/GWT_perturbseq_analysis_2025/848d62fc2b7027f7218d6fc5f5b0c37255dc94af/metadata/suppl_tables/polarization_prediction_condition_comparison_regulator_coefficients.csv
+    bytes: 2639223
+    sha256: 57e57c9a825b4d49a3fff6c4e529bb3366c432d3639d026953addfcfe19ac25f
+  arrayed_followup:
+    filename: IL10_IL21_arrayed_validation.csv
+    url: https://raw.githubusercontent.com/emdann/GWT_perturbseq_analysis_2025/848d62fc2b7027f7218d6fc5f5b0c37255dc94af/metadata/suppl_tables/IL10_IL21_arrayed_validation.csv
+    bytes: 2200
+    sha256: f60cdda392d6f29d10a539727ff7324b04d17e35c0512c889b733e00380b83dc
+
+analysis:
+  conditions: [Rest, Stim8hr, Stim48hr]
+  top_n_per_condition: 15
+  gates:
+    require_ontarget_significant: true
+    require_negative_ontarget_effect: true  # strict ontarget_effect_size < 0
+    exclude_offtarget_flag: true            # strict offtarget_flag == False
+    min_cells_target: 100                   # n_cells_target >= 100
+    require_crossdonor_correlation_min: true
+    min_crossdonor_correlation_min: 0.0     # strict value > 0; missing fails
+    require_crossguide_correlation: true
+    min_crossguide_correlation: 0.0         # strict value > 0; missing fails
+  ranking:
+    group_by: culture_condition
+    method: geometric_mean_of_within_condition_percentile_ranks
+    higher_is_better: true
+    metrics:
+      - n_downstream
+      - crossdonor_correlation_min
+      - crossguide_correlation
+    score_name: priority_score
+  cross_condition:
+    descriptive_only: true
+    interaction_test: false
+  polarization_annotation:
+    regulator_key: regulator
+    include_source_qc_pass_genes: true
+    mark_top_candidates_by_condition: true
+    mark_cross_condition_candidates: true
+    descriptive_only: true
+
+arrayed_followup:
+  control_label_prefix: NTC
+  donor_key: Donor
+  perturbation_key: Perturbation
+  measurements: [IL10_perc, IL21_perc]
+  comparison: perturbation_minus_donor_mean_ntc
+  impute_missing: false
+  descriptive_only: true
+  confirmatory_test: false
+
+claims:
+  preferred_terms:
+    - source-QC candidate
+    - prioritized candidate
+    - reproducible candidate according to supplied metrics
+  prohibited_without_new_evidence:
+    - independently verified
+    - experimentally validated
+    - drug target

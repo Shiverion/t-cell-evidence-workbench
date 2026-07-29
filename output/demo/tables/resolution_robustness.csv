@@ -1,0 +1,5 @@
+resolution,headline_subtype,n_donors_a,n_donors_b,delta,p_adj,matching_direction,passes_fdr,robust
+0.4,terminally_exhausted,6,6,1.9223299572426455,1.1625416891428959e-05,True,True,True
+0.6,terminally_exhausted,6,6,1.886305095623507,0.0002712306539435665,True,True,True
+0.8,terminally_exhausted,6,6,1.886305095623507,0.0002712306539435665,True,True,True
+1.0,terminally_exhausted,6,6,1.886305095623507,0.0002712306539435665,True,True,True

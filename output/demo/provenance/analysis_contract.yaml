@@ -1,0 +1,52 @@
+input_path: C:\Users\miqba\projects\claude-science-hackathon-learning-plan\data\demo_tcells.h5ad
+output_dir: C:\Users\miqba\projects\claude-science-hackathon-learning-plan\output\demo
+condition_key: condition
+donor_key: donor
+condition_a: A
+condition_b: B
+counts_layer: counts
+seed: 42
+qc:
+  min_genes: 10
+  max_genes: 500
+  max_mito_pct: 20.0
+  min_cells_per_gene: 1
+resolutions:
+- 0.4
+- 0.6
+- 0.8
+- 1.0
+marker_panels:
+  memory_stem_like:
+  - TCF7
+  - IL7R
+  - SELL
+  - CCR7
+  effector_cytotoxic:
+  - GZMB
+  - PRF1
+  - NKG7
+  - GZMK
+  terminally_exhausted:
+  - TOX
+  - PDCD1
+  - HAVCR2
+  - ENTPD1
+  - LAYN
+effector_memory_rule:
+  positive:
+  - GZMK
+  - NKG7
+  - IL7R
+  negative:
+  - HAVCR2
+  - ENTPD1
+  min_positive: 2
+exhaustion_genes:
+- PDCD1
+- HAVCR2
+- LAG3
+- TOX
+- TIGIT
+- ENTPD1
+min_donors_per_condition: 4

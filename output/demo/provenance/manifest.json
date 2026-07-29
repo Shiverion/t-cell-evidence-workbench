@@ -1,0 +1,200 @@
+{
+  "analysis_contract": {
+    "condition_a": "A",
+    "condition_b": "B",
+    "condition_key": "condition",
+    "counts_layer": "counts",
+    "donor_key": "donor",
+    "effector_memory_rule": {
+      "min_positive": 2,
+      "negative": [
+        "HAVCR2",
+        "ENTPD1"
+      ],
+      "positive": [
+        "GZMK",
+        "NKG7",
+        "IL7R"
+      ]
+    },
+    "exhaustion_genes": [
+      "PDCD1",
+      "HAVCR2",
+      "LAG3",
+      "TOX",
+      "TIGIT",
+      "ENTPD1"
+    ],
+    "input_path": "C:\\Users\\miqba\\projects\\claude-science-hackathon-learning-plan\\data\\demo_tcells.h5ad",
+    "marker_panels": {
+      "effector_cytotoxic": [
+        "GZMB",
+        "PRF1",
+        "NKG7",
+        "GZMK"
+      ],
+      "memory_stem_like": [
+        "TCF7",
+        "IL7R",
+        "SELL",
+        "CCR7"
+      ],
+      "terminally_exhausted": [
+        "TOX",
+        "PDCD1",
+        "HAVCR2",
+        "ENTPD1",
+        "LAYN"
+      ]
+    },
+    "min_donors_per_condition": 4,
+    "output_dir": "C:\\Users\\miqba\\projects\\claude-science-hackathon-learning-plan\\output\\demo",
+    "qc": {
+      "max_genes": 500,
+      "max_mito_pct": 20.0,
+      "min_cells_per_gene": 1,
+      "min_genes": 10
+    },
+    "resolutions": [
+      0.4,
+      0.6,
+      0.8,
+      1.0
+    ],
+    "seed": 42
+  },
+  "artifacts": [
+    {
+      "bytes": 82341,
+      "path": "figures/01_qc.png",
+      "sha256": "024eef1ab60328e7e1a6dd9a81b6575eeb7b82d414ab541cfd465b16885b7582"
+    },
+    {
+      "bytes": 278272,
+      "path": "figures/02_annotated_cd8_umap.png",
+      "sha256": "1f8e0555e7f11f70bdcf5f854f32b7d9d4ad7c9d86f95d1c7b0e77ed59eb626d"
+    },
+    {
+      "bytes": 198446,
+      "path": "figures/03_exhaustion_violin.png",
+      "sha256": "581af89361bef7a7d2fba23d341f9374699aa0673b87e2e514eb33d3c8d6736d"
+    },
+    {
+      "bytes": 78549,
+      "path": "figures/04_pseudobulk_volcano.png",
+      "sha256": "0eb5b2fc78c11530f1616e2dec46a2faee2736b5f241c7b0b5acbee6d11f177e"
+    },
+    {
+      "bytes": 66436,
+      "path": "figures/05_resolution_robustness.png",
+      "sha256": "db9ac9f3ff661527dc9c7ca992471f894b3f273e337410efeeb9efcd5e154a71"
+    },
+    {
+      "bytes": 2389,
+      "path": "methods.md",
+      "sha256": "ca8deb11e60a1f65a8f9f5fd21b6154d2f8d12491fbc2598b057c22f806cbcf4"
+    },
+    {
+      "bytes": 885916,
+      "path": "processed_cd8_analysis.h5ad",
+      "sha256": "34231eb145dec9195ecf32fc95606f7221b5b59909c8d454410aafe56cd66f85"
+    },
+    {
+      "bytes": 865,
+      "path": "provenance/analysis_contract.yaml",
+      "sha256": "b405c5eab7af6386bd9ad53dc01141586c65aafe16668541ff075ebcf775efcd"
+    },
+    {
+      "bytes": 2092,
+      "path": "provenance/evidence_used.csv",
+      "sha256": "cebf8e350a88a9be99ac895272d23a30611d60a0c3c4ce681bd0939716bcc69b"
+    },
+    {
+      "bytes": 447,
+      "path": "provenance/input_audit.json",
+      "sha256": "4f279a5c9a43cabca38ef3afe857d0ec3c8a9cbe7d5497900651094bef333f66"
+    },
+    {
+      "bytes": 5047,
+      "path": "report.md",
+      "sha256": "191171962952a7737d3e49760b1d0af997fbc92aedac98a55d5a709f3a18c464"
+    },
+    {
+      "bytes": 33019,
+      "path": "tables/cell_qc_and_gate.csv",
+      "sha256": "7959bedd27a22567142cbd9dc95d8aa6a38c73c320101ebf09d640e2fab52ac7"
+    },
+    {
+      "bytes": 3813,
+      "path": "tables/cluster_annotation_scores.csv",
+      "sha256": "927af8f18337f00d417b7783b4164295cd5efb710a5cf5e857d1a58c9b20a309"
+    },
+    {
+      "bytes": 911,
+      "path": "tables/donor_exhaustion_statistics.csv",
+      "sha256": "b6b62c8670c88709c3af42d343faa15e9d67afb5c7364abf3b789b9fd93bc847"
+    },
+    {
+      "bytes": 27852,
+      "path": "tables/per_cell_de_exploratory.csv",
+      "sha256": "bb2cbc6c9bb47fbe653e5a090788254682165e5fc35f7c2abd606b4e39f0772f"
+    },
+    {
+      "bytes": 21188,
+      "path": "tables/pseudobulk_de_primary.csv",
+      "sha256": "3fa05f77eb659ca711c4aec441cb5fb6f901de68a852e9b664692c6b882652d8"
+    },
+    {
+      "bytes": 20556,
+      "path": "tables/pseudobulk_logcpm_sensitivity.csv",
+      "sha256": "1cd60c5bd09315d39b774bc9b9e00342aa3ee7dcfe0af5957212440f70a0f55b"
+    },
+    {
+      "bytes": 407,
+      "path": "tables/pseudobulk_sample_manifest.csv",
+      "sha256": "3a7c52b786e81170fbeaeb5fcf0d59ea63009308c7b156c610339dd37ab62515"
+    },
+    {
+      "bytes": 442,
+      "path": "tables/resolution_robustness.csv",
+      "sha256": "15b087b99559779dc875101910df29ae416e814d933aeabb05073267be414d56"
+    },
+    {
+      "bytes": 8614,
+      "path": "tables/reviewer_findings.csv",
+      "sha256": "5c8b22c38a326a4c1e9b9e1aed059786eb34a94a9493aec7ad653f5eb81a1924"
+    },
+    {
+      "bytes": 2012,
+      "path": "three_minute_walkthrough.md",
+      "sha256": "0ab37f1aee4a9912f8b78f7ac8772d3b0fb1d042b180faac628e9eb273bc83d0"
+    }
+  ],
+  "input_sha256": "ee42b2c9d2519e259952360ec67e257db5f96131f3f8e992cd9917b49bc37a58",
+  "package_versions": {
+    "anndata": "0.12.19",
+    "igraph": "1.0.0",
+    "leidenalg": "0.11.0",
+    "matplotlib": "3.10.9",
+    "numpy": "2.4.6",
+    "pandas": "2.3.3",
+    "pydeseq2": "0.5.4",
+    "python": "3.12.13",
+    "scanpy": "1.12.2",
+    "scipy": "1.18.0",
+    "seaborn": "0.13.2",
+    "verified-tcell-exhaustion-triage": "0.1.0"
+  },
+  "result_summary": {
+    "branch": "donor_aware",
+    "headline": {
+      "delta": 1.886305095623507,
+      "p_adj": 0.0002712306539435665,
+      "significant": true,
+      "subtype": "terminally_exhausted"
+    },
+    "reviewer_rows": 30,
+    "robust": true,
+    "simulated": true
+  }
+}

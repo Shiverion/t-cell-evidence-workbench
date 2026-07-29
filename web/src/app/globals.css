@@ -1,0 +1,483 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: dark;
+  --canvas: oklch(0.16 0.012 175);
+  --surface: oklch(0.2 0.013 175);
+  --surface-strong: oklch(0.245 0.014 175);
+  --ink: oklch(0.94 0.012 160);
+  --ink-soft: oklch(0.74 0.017 170);
+  --ink-faint: oklch(0.64 0.015 170);
+  --line: oklch(0.3 0.014 175);
+  --line-strong: oklch(0.41 0.018 175);
+  --accent: oklch(0.74 0.105 172);
+  --accent-dark: oklch(0.82 0.105 172);
+  --accent-soft: oklch(0.27 0.045 172);
+  --warning: oklch(0.78 0.11 75);
+  --danger: oklch(0.72 0.14 25);
+  --success: oklch(0.76 0.1 150);
+  --shadow: oklch(0.055 0.01 175 / 0.62);
+  --graph-grid: oklch(0.39 0.018 175);
+  --graph-edge: oklch(0.48 0.028 170);
+  --graph-edge-active: oklch(0.79 0.105 172);
+  --graph-edge-dim: oklch(0.34 0.015 175);
+  --graph-gene: oklch(0.62 0.09 172);
+  --graph-result: oklch(0.58 0.065 188);
+  --graph-summary: oklch(0.61 0.07 158);
+  --graph-annotation: oklch(0.62 0.035 105);
+  --graph-followup: oklch(0.66 0.08 145);
+  --graph-gap: oklch(0.71 0.1 75);
+  --graph-source: oklch(0.55 0.025 250);
+  --sidebar-width: 16.5rem;
+}
+
+@theme inline {
+  --color-background: var(--canvas);
+  --color-foreground: var(--ink);
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-surface-strong: var(--surface-strong);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-ink-faint: var(--ink-faint);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-accent: var(--accent);
+  --color-accent-dark: var(--accent-dark);
+  --color-accent-soft: var(--accent-soft);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --color-success: var(--success);
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+}
+
+* {
+  border-color: var(--line);
+}
+
+html {
+  background: var(--canvas);
+  color: var(--ink);
+  scroll-behavior: smooth;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  min-height: 100dvh;
+  background:
+    radial-gradient(
+      circle at 88% -8%,
+      color-mix(in oklch, var(--accent) 8%, transparent) 0,
+      transparent 31rem
+    ),
+    linear-gradient(to right, color-mix(in oklch, var(--line) 24%, transparent) 1px, transparent 1px),
+    var(--canvas);
+  background-size: 4rem 100%;
+  color: var(--ink);
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+button,
+a,
+input,
+select,
+textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button,
+a {
+  transition:
+    color 180ms cubic-bezier(0.16, 1, 0.3, 1),
+    background-color 180ms cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 180ms cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 180ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 180ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+button:active,
+a:active {
+  transform: translateY(1px);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+::selection {
+  background: var(--accent-soft);
+  color: var(--accent-dark);
+}
+
+.numeric {
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+.paper-surface {
+  background: color-mix(in oklch, var(--surface) 96%, transparent);
+  box-shadow:
+    0 24px 64px -42px var(--shadow),
+    inset 0 1px color-mix(in oklch, var(--ink) 3%, transparent);
+}
+
+.hairline-grid {
+  background-image:
+    linear-gradient(to right, color-mix(in oklch, var(--line) 55%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in oklch, var(--line) 55%, transparent) 1px, transparent 1px);
+  background-size: 2rem 2rem;
+}
+
+.page-enter {
+  animation: page-enter 440ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.reviewer-tools-dock {
+  right: max(1rem, env(safe-area-inset-right));
+  bottom: max(1rem, env(safe-area-inset-bottom));
+}
+
+.reviewer-tour-panel {
+  right: max(1rem, env(safe-area-inset-right));
+  bottom: calc(4.75rem + env(safe-area-inset-bottom));
+  width: min(24rem, calc(100vw - 2rem));
+  animation: reviewer-panel-enter 260ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.reviewer-dialog[open] {
+  animation: reviewer-dialog-enter 260ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.reviewer-dialog::backdrop {
+  animation: reviewer-backdrop-enter 220ms ease-out both;
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--surface-strong) 20%,
+    color-mix(in oklch, var(--surface) 84%, var(--line)) 50%,
+    var(--surface-strong) 80%
+  );
+  background-size: 220% 100%;
+  animation: skeleton-shift 1.4s ease-in-out infinite;
+}
+
+.evidence-node {
+  position: relative;
+  display: grid;
+  grid-template-columns: 2rem minmax(0, 1fr);
+  gap: 0.75rem;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  overflow: hidden;
+  border: 1px solid var(--line-strong);
+  border-radius: 0.65rem;
+  background: color-mix(in oklch, var(--surface) 96%, transparent);
+  padding: 0.72rem 0.8rem;
+  box-shadow:
+    0 16px 34px -24px var(--shadow),
+    inset 3px 0 var(--graph-node-accent, var(--accent));
+  color: var(--ink);
+  transition:
+    opacity 200ms cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 200ms cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 200ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.evidence-node--gene {
+  --graph-node-accent: var(--graph-gene);
+  background: color-mix(in oklch, var(--accent-soft) 58%, var(--surface));
+}
+
+.evidence-node--result {
+  --graph-node-accent: var(--graph-result);
+}
+
+.evidence-node--summary {
+  --graph-node-accent: var(--graph-summary);
+}
+
+.evidence-node--annotation {
+  --graph-node-accent: var(--graph-annotation);
+}
+
+.evidence-node--followup {
+  --graph-node-accent: var(--graph-followup);
+}
+
+.evidence-node--gap {
+  --graph-node-accent: var(--graph-gap);
+  border-style: dashed;
+}
+
+.evidence-node--source {
+  --graph-node-accent: var(--graph-source);
+}
+
+.evidence-node.is-related {
+  border-color: color-mix(in oklch, var(--graph-node-accent) 62%, var(--line));
+}
+
+.evidence-node.is-focused {
+  border-color: var(--graph-node-accent);
+  box-shadow:
+    0 20px 42px -26px color-mix(in oklch, var(--graph-node-accent) 56%, var(--shadow)),
+    inset 3px 0 var(--graph-node-accent),
+    inset 0 0 0 1px color-mix(in oklch, var(--graph-node-accent) 20%, transparent);
+  transform: translateY(-1px);
+}
+
+.evidence-node.is-dimmed {
+  opacity: 0.22;
+}
+
+.evidence-node__icon {
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  border: 1px solid color-mix(in oklch, var(--graph-node-accent) 48%, var(--line));
+  border-radius: 0.45rem;
+  background: color-mix(in oklch, var(--graph-node-accent) 13%, var(--surface-strong));
+  color: var(--graph-node-accent);
+}
+
+.evidence-node__eyebrow {
+  overflow: hidden;
+  color: var(--ink-faint);
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.58rem;
+  font-weight: 650;
+  letter-spacing: 0.09em;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.evidence-node__label {
+  margin-top: 0.2rem;
+  overflow: hidden;
+  color: var(--ink);
+  font-size: 0.78rem;
+  font-weight: 650;
+  letter-spacing: -0.015em;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.evidence-node__metric {
+  margin-top: 0.28rem;
+  overflow: hidden;
+  color: color-mix(in oklch, var(--graph-node-accent) 76%, var(--ink));
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.62rem;
+  font-weight: 600;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.evidence-handle {
+  width: 0.45rem !important;
+  height: 0.45rem !important;
+  border: 1px solid var(--surface) !important;
+  background: var(--graph-node-accent) !important;
+  opacity: 0;
+}
+
+.react-flow__node:hover .evidence-handle,
+.react-flow__node.selected .evidence-handle,
+.react-flow__node:focus-visible .evidence-handle {
+  opacity: 1;
+}
+
+.react-flow__node:focus-visible {
+  outline: none;
+}
+
+.react-flow__node:focus-visible .evidence-node {
+  border-color: var(--accent);
+  box-shadow:
+    0 0 0 3px color-mix(in oklch, var(--accent) 22%, transparent),
+    0 20px 42px -26px var(--shadow),
+    inset 3px 0 var(--graph-node-accent);
+}
+
+.react-flow__edge-path,
+.react-flow__edge-text,
+.react-flow__edge-textbg {
+  transition:
+    opacity 200ms cubic-bezier(0.16, 1, 0.3, 1),
+    stroke 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.react-flow__edge:focus-visible .react-flow__edge-path {
+  stroke: var(--graph-edge-active) !important;
+  stroke-width: 2.2 !important;
+}
+
+.react-flow__controls {
+  overflow: hidden;
+  border: 1px solid var(--line-strong) !important;
+  border-radius: 0.65rem !important;
+  box-shadow: 0 16px 34px -24px var(--shadow) !important;
+}
+
+.react-flow__controls-button {
+  width: 2.75rem !important;
+  height: 2.75rem !important;
+  border-color: var(--line) !important;
+  background: color-mix(in oklch, var(--surface) 96%, transparent) !important;
+  color: var(--ink) !important;
+}
+
+.react-flow__controls-button:hover {
+  background: var(--surface-strong) !important;
+  color: var(--accent-dark) !important;
+}
+
+.react-flow__controls-button svg {
+  max-width: 1rem;
+  max-height: 1rem;
+  fill: currentColor;
+}
+
+.react-flow__minimap {
+  overflow: hidden;
+  border: 1px solid var(--line-strong);
+  border-radius: 0.65rem;
+  background: var(--surface) !important;
+  box-shadow: 0 16px 34px -24px var(--shadow);
+}
+
+.react-flow__attribution {
+  border: 1px solid var(--line);
+  background: color-mix(in oklch, var(--surface) 90%, transparent) !important;
+  color: var(--ink-faint) !important;
+  font-size: 0.58rem;
+}
+
+.react-flow__attribution a {
+  color: inherit !important;
+}
+
+.evidence-legend-dot {
+  width: 0.7rem;
+  height: 0.7rem;
+  flex: 0 0 auto;
+  border-radius: 0.2rem;
+  background: var(--graph-gene);
+  box-shadow: 0 0 0 4px color-mix(in oklch, var(--graph-gene) 12%, transparent);
+}
+
+.evidence-legend-dot--result {
+  background: var(--graph-result);
+}
+
+.evidence-legend-dot--summary {
+  background: var(--graph-summary);
+}
+
+.evidence-legend-dot--annotation {
+  background: var(--graph-annotation);
+}
+
+.evidence-legend-dot--followup {
+  background: var(--graph-followup);
+}
+
+.evidence-legend-dot--gap {
+  background: var(--graph-gap);
+}
+
+.evidence-legend-dot--source {
+  background: var(--graph-source);
+}
+
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes reviewer-panel-enter {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes reviewer-dialog-enter {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes reviewer-backdrop-enter {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes skeleton-shift {
+  from {
+    background-position: 120% 0;
+  }
+  to {
+    background-position: -120% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media (max-width: 767px) {
+  .evidence-minimap {
+    display: none;
+  }
+}
+
+@media (max-width: 639px) {
+  .reviewer-tools-dock {
+    right: 1rem;
+    left: 1rem;
+    justify-content: flex-end;
+  }
+
+  .reviewer-tour-panel {
+    right: 1rem;
+    left: 1rem;
+    width: auto;
+  }
+}

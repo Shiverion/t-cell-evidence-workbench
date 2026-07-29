@@ -1,0 +1,17 @@
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+data/*.h5ad
+data/official/
+data/official_cd4_perturbseq/
+output/notebook_demo/
+output/test*/
+tmp/
+.vercel/
+web/.npm-*.log
+web/.analysis-output/
+
+.vercel

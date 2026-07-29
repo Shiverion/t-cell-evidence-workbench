@@ -1,0 +1,21 @@
+# Copy this file, then map these values to the organizer's data dictionary.
+# Do not guess column meanings. The input audit will stop on missing raw counts
+# or genes rather than silently substituting normalized values.
+input_path: ../data/replace-with-organizer-data.h5ad
+output_dir: ../output/real-run
+condition_key: condition       # e.g. disease_status, treatment, or timepoint
+donor_key: donor               # independent biological replicate/sample
+condition_a: A                 # reference condition
+condition_b: B                 # tested condition
+counts_layer: counts           # must contain non-negative integer raw counts
+seed: 42
+min_donors_per_condition: 4
+resolutions: [0.4, 0.6, 0.8, 1.0]
+qc:
+  # Dataset-dependent: lock these after reading the data dictionary and before
+  # inspecting the condition result.
+  min_genes: 200
+  max_genes: 6000
+  max_mito_pct: 20.0
+  min_cells_per_gene: 3
+

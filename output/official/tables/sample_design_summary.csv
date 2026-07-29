@@ -1,0 +1,4 @@
+culture_condition,n_samples,n_donors,n_runs,n_libraries
+Rest,4,4,2,4
+Stim8hr,4,4,2,4
+Stim48hr,4,4,1,4

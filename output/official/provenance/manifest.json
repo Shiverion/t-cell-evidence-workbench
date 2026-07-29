@@ -1,0 +1,214 @@
+{
+  "analysis_contract": {
+    "conditions": [
+      "Rest",
+      "Stim8hr",
+      "Stim48hr"
+    ],
+    "data_dir": "data\\official",
+    "hard_gates": {
+      "crossdonor_correlation_min": "present and > 0",
+      "crossguide_correlation": "present and > 0",
+      "n_cells_target": ">= 100",
+      "offtarget_flag": false,
+      "ontarget_effect_size": "< 0",
+      "ontarget_significant": true
+    },
+    "min_cells_target": 100,
+    "output_dir": "output\\official",
+    "top_n": 15
+  },
+  "artifacts": [
+    {
+      "bytes": 151644,
+      "path": "figures/01_filter_funnel.png",
+      "sha256": "37bb6e9378fec100a1559a0a2c354e964ad06c40cd5f85fc735adf60ed01efc0"
+    },
+    {
+      "bytes": 86669,
+      "path": "figures/02_top_candidates.png",
+      "sha256": "c4ae2872c65ef0e60be46d63d95fb31c8d7c894690d3973d869dce37e7b60c3d"
+    },
+    {
+      "bytes": 196985,
+      "path": "figures/03_cross_condition_scores.png",
+      "sha256": "20f90f9403f3d4db7c27689b68ab957f741e83330f549341a79872243e94b3ba"
+    },
+    {
+      "bytes": 165955,
+      "path": "figures/04_arrayed_validation_deltas.png",
+      "sha256": "3a95474d004eab495897e2df3a8698246fb102bf1dab242eaf800fdfb7379beb"
+    },
+    {
+      "bytes": 3312,
+      "path": "methods.md",
+      "sha256": "3a2aee669a738fe459f513bf7f15edd82b2ab4cdad27de6b0bf3b508db969246"
+    },
+    {
+      "bytes": 1273,
+      "path": "provenance/source_audit.json",
+      "sha256": "62f529df6da621db5e7d26819bf01125f782d9cc8f9f12d7b6820e575ada10d0"
+    },
+    {
+      "bytes": 12490,
+      "path": "report.md",
+      "sha256": "0811addb6400e64f17b2725c1cb47c112c78d394d20cadbc54165c5b7f380d3f"
+    },
+    {
+      "bytes": 429,
+      "path": "run_summary.json",
+      "sha256": "8df6227915c18ca9c8247327d5994c14ed803cb5f4ff3eece50e915ac5137061"
+    },
+    {
+      "bytes": 584829,
+      "path": "tables/candidate_polarization_coefficients.csv",
+      "sha256": "384aaddc7b123bf40debdfc098a04eceb16043a7a7c4a3b914320841831db1b0"
+    },
+    {
+      "bytes": 486448,
+      "path": "tables/candidate_scores.csv",
+      "sha256": "284bc5bdcf0509579788e00ec8fedf2b8aad43679d81c0a37f75f6fe99d8eb2f"
+    },
+    {
+      "bytes": 23753,
+      "path": "tables/cross_condition_candidates.csv",
+      "sha256": "035bcccb3ede0b5746bf1adfbf07305dda9dce5ac841768c035e2779529d05d4"
+    },
+    {
+      "bytes": 945,
+      "path": "tables/filter_funnel.csv",
+      "sha256": "4a5d1c4df885ad157551701bad6e5ab0c363b542ecf64481acf255451689aa07"
+    },
+    {
+      "bytes": 106,
+      "path": "tables/sample_design_summary.csv",
+      "sha256": "70935cdf2823dc40ad3db9ed884321dac1697c71a5359c19ed1817df57cdeafa"
+    },
+    {
+      "bytes": 10584514,
+      "path": "tables/source_qc_decisions.csv",
+      "sha256": "a57ebcedebda286afbc5e9e86b0b8b387605736f9cda46e42c6b536f8688fe49"
+    },
+    {
+      "bytes": 13953,
+      "path": "tables/top_candidates_by_condition.csv",
+      "sha256": "ff6325539877d93b6e191dd9b1890164ed425ae87bc46e621a8cdb649449b8cd"
+    },
+    {
+      "bytes": 3198,
+      "path": "tables/validation_donor_deltas.csv",
+      "sha256": "31e6932d9a3b92cd71e39a0a82ce103852cc58b3374cefcc3ee0b7fea90ae83a"
+    },
+    {
+      "bytes": 861,
+      "path": "tables/validation_summary.csv",
+      "sha256": "4305547f9c3c2dc6f4f1f788ce1147f3450077deba031cff42abb57cfbed5337"
+    }
+  ],
+  "generated_at_utc": "2026-07-18T01:46:35.004449+00:00",
+  "package_versions": {
+    "matplotlib": "3.10.9",
+    "numpy": "2.4.6",
+    "pandas": "2.3.3",
+    "python": "3.12.13"
+  },
+  "pinned_commit": "848d62fc2b7027f7218d6fc5f5b0c37255dc94af",
+  "source_audit": {
+    "checks": {
+      "all_validation_donors_have_ntc": true,
+      "boolean_columns_parse": true,
+      "numeric_columns_parse": true,
+      "unique_gene_condition_rows": true,
+      "unique_sample_ids": true
+    },
+    "design": {
+      "arrayed_validation_donors": [
+        "Donor10",
+        "Donor5",
+        "Donor6",
+        "Donor7",
+        "Donor8",
+        "Donor9"
+      ],
+      "conditions": [
+        "Rest",
+        "Stim8hr",
+        "Stim48hr"
+      ],
+      "screen_donors": [
+        "CE0006864",
+        "CE0008162",
+        "CE0008678",
+        "CE0010866"
+      ],
+      "screen_samples": 12
+    },
+    "source": {
+      "pinned_commit": "848d62fc2b7027f7218d6fc5f5b0c37255dc94af",
+      "repository": "https://github.com/emdann/GWT_perturbseq_analysis_2025"
+    },
+    "status": "passed",
+    "tables": {
+      "arrayed_validation": {
+        "columns": 5,
+        "required_columns_present": true,
+        "rows": 53
+      },
+      "de_stats": {
+        "columns": 19,
+        "required_columns_present": true,
+        "rows": 33983
+      },
+      "polarization_coefficients": {
+        "columns": 9,
+        "required_columns_present": true,
+        "rows": 23172
+      },
+      "sample_metadata": {
+        "columns": 18,
+        "required_columns_present": true,
+        "rows": 12
+      }
+    }
+  },
+  "source_files": [
+    {
+      "bytes": 5341369,
+      "expected_bytes": 5341369,
+      "expected_sha256": "66fb80b93ef107095a8218efa06a5b272093d9343e9009b3ea4a88ba3cafdead",
+      "key": "de_stats",
+      "path": "C:\\Users\\miqba\\projects\\claude-science-hackathon-learning-plan\\data\\official\\DE_stats.suppl_table.csv",
+      "sha256": "66fb80b93ef107095a8218efa06a5b272093d9343e9009b3ea4a88ba3cafdead",
+      "url": "https://raw.githubusercontent.com/emdann/GWT_perturbseq_analysis_2025/848d62fc2b7027f7218d6fc5f5b0c37255dc94af/metadata/suppl_tables/DE_stats.suppl_table.csv"
+    },
+    {
+      "bytes": 2966,
+      "expected_bytes": 2966,
+      "expected_sha256": "766134d11dabb5d63388e00b4d687a809c0254eb3c19d77f439a6bf9dad7abd4",
+      "key": "sample_metadata",
+      "path": "C:\\Users\\miqba\\projects\\claude-science-hackathon-learning-plan\\data\\official\\sample_metadata.suppl_table.csv",
+      "sha256": "766134d11dabb5d63388e00b4d687a809c0254eb3c19d77f439a6bf9dad7abd4",
+      "url": "https://raw.githubusercontent.com/emdann/GWT_perturbseq_analysis_2025/848d62fc2b7027f7218d6fc5f5b0c37255dc94af/metadata/suppl_tables/sample_metadata.suppl_table.csv"
+    },
+    {
+      "bytes": 2200,
+      "expected_bytes": 2200,
+      "expected_sha256": "f60cdda392d6f29d10a539727ff7324b04d17e35c0512c889b733e00380b83dc",
+      "key": "arrayed_validation",
+      "path": "C:\\Users\\miqba\\projects\\claude-science-hackathon-learning-plan\\data\\official\\IL10_IL21_arrayed_validation.csv",
+      "sha256": "f60cdda392d6f29d10a539727ff7324b04d17e35c0512c889b733e00380b83dc",
+      "url": "https://raw.githubusercontent.com/emdann/GWT_perturbseq_analysis_2025/848d62fc2b7027f7218d6fc5f5b0c37255dc94af/metadata/suppl_tables/IL10_IL21_arrayed_validation.csv"
+    },
+    {
+      "bytes": 2639223,
+      "expected_bytes": 2639223,
+      "expected_sha256": "57e57c9a825b4d49a3fff6c4e529bb3366c432d3639d026953addfcfe19ac25f",
+      "key": "polarization_coefficients",
+      "path": "C:\\Users\\miqba\\projects\\claude-science-hackathon-learning-plan\\data\\official\\polarization_prediction_condition_comparison_regulator_coefficients.csv",
+      "sha256": "57e57c9a825b4d49a3fff6c4e529bb3366c432d3639d026953addfcfe19ac25f",
+      "url": "https://raw.githubusercontent.com/emdann/GWT_perturbseq_analysis_2025/848d62fc2b7027f7218d6fc5f5b0c37255dc94af/metadata/suppl_tables/polarization_prediction_condition_comparison_regulator_coefficients.csv"
+    }
+  ],
+  "source_repository": "https://github.com/emdann/GWT_perturbseq_analysis_2025",
+  "workflow": "official-cd4-perturbseq-lightweight-triage"
+}

@@ -1,0 +1,58 @@
+{
+  "checks": {
+    "all_validation_donors_have_ntc": true,
+    "boolean_columns_parse": true,
+    "numeric_columns_parse": true,
+    "unique_gene_condition_rows": true,
+    "unique_sample_ids": true
+  },
+  "design": {
+    "arrayed_validation_donors": [
+      "Donor10",
+      "Donor5",
+      "Donor6",
+      "Donor7",
+      "Donor8",
+      "Donor9"
+    ],
+    "conditions": [
+      "Rest",
+      "Stim8hr",
+      "Stim48hr"
+    ],
+    "screen_donors": [
+      "CE0006864",
+      "CE0008162",
+      "CE0008678",
+      "CE0010866"
+    ],
+    "screen_samples": 12
+  },
+  "source": {
+    "pinned_commit": "848d62fc2b7027f7218d6fc5f5b0c37255dc94af",
+    "repository": "https://github.com/emdann/GWT_perturbseq_analysis_2025"
+  },
+  "status": "passed",
+  "tables": {
+    "arrayed_validation": {
+      "columns": 5,
+      "required_columns_present": true,
+      "rows": 53
+    },
+    "de_stats": {
+      "columns": 19,
+      "required_columns_present": true,
+      "rows": 33983
+    },
+    "polarization_coefficients": {
+      "columns": 9,
+      "required_columns_present": true,
+      "rows": 23172
+    },
+    "sample_metadata": {
+      "columns": 18,
+      "required_columns_present": true,
+      "rows": 12
+    }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "cross_condition_candidate_count": 224,
+  "lead_cross_condition_candidate": {
+    "gene": "SETDB1",
+    "min_priority_score": 0.9146892514429616,
+    "worst_condition": "Stim8hr"
+  },
+  "output_dir": "C:\\Users\\miqba\\projects\\claude-science-hackathon-learning-plan\\output\\official",
+  "source_qc_passes_by_condition": {
+    "Rest": 497,
+    "Stim48hr": 562,
+    "Stim8hr": 593
+  },
+  "status": "complete"
+}
