@@ -115,25 +115,65 @@ The system has two parts: a deterministic Python triage pipeline that produces a
 
 ### Architecture
 
-```text
- Public sources (S3 bucket, authors' GitHub)            4 summary CSVs (pinned URLs + hashes)
-            │  perturbseq-triage all
-            ▼
- sources.py ─► audit (schema, hashes, 4 donors × 3 conditions)
-            ─► analysis.py: 6 registered gates ─► within-condition percentiles
-               ─► priority_score = geometric mean(n_downstream, crossdonor_min, crossguide)
-               ─► cross-condition overlap · polarization annotation · arrayed follow-up deltas
-            ─► reporting.py / plotting.py
-            ▼
- output/official/  tables/*.csv · figures/*.png · report.md · methods.md
-                   run_summary.json · provenance/manifest.json (SHA-256 per artefact)
-            │  web/stage-analysis.mjs (build step; refuses paths outside the app)
-            ▼
- Next.js workbench (Vercel)
-   startup: fingerprint manifest ─► every table read verified against its SHA-256
-            ─► cached under the manifest fingerprint (no revalidation)
-   routes: / · /explore · /genes/[gene] (React Flow + ELK graph) · /compare
-           /robustness · /findings · /provenance · /api/client-errors
+```mermaid
+flowchart TD
+    subgraph external["Public sources"]
+        Sources(["S3 bucket and<br/>authors' GitHub"])
+        Csvs[("4 summary CSVs<br/>pinned URLs and hashes")]
+        Sources --> Csvs
+    end
+
+    subgraph pipeline["Deterministic Python pipeline"]
+        SourcePy["sources.py"]
+        Audit["Audit schema and hashes<br/>4 donors × 3 conditions"]
+        Gates["analysis.py<br/>6 registered gates"]
+        Percentiles["Within-condition percentiles"]
+        Score["Priority score<br/>geometric mean"]
+        Enrichment["Cross-condition overlap<br/>polarization annotation<br/>arrayed follow-up deltas"]
+        Reporting["reporting.py<br/>plotting.py"]
+
+        SourcePy --> Audit
+        Audit --> Gates
+        Gates --> Percentiles
+        Percentiles --> Score
+        Score --> Enrichment
+        Enrichment --> Reporting
+    end
+
+    subgraph bundle["Hashed artefact bundle"]
+        Output[("output/official<br/>tables, figures, reports<br/>summary and manifest")]
+        Stage["stage-analysis.mjs<br/>stages bundle<br/>rejects outside-app paths"]
+        Output --> Stage
+    end
+
+    subgraph web["Read-only Next.js workbench"]
+        App["Next.js workbench<br/>Vercel"]
+        Fingerprint["Fingerprint manifest<br/>at startup"]
+        Verify["Verify every table<br/>against SHA-256"]
+        Cache[("Cache by<br/>manifest fingerprint")]
+        Routes["Explore and compare<br/>robustness, findings<br/>provenance and errors"]
+        Gene["Gene dossier<br/>React Flow + ELK"]
+
+        App --> Fingerprint
+        App --> Routes
+        App --> Gene
+        Fingerprint --> Verify
+        Routes --> Verify
+        Gene --> Verify
+        Verify --> Cache
+    end
+
+    Csvs -->|"perturbseq-triage all"| SourcePy
+    Reporting --> Output
+    Stage --> App
+
+    class Sources ext
+    class Csvs,Output,Cache store
+    class Audit,Gates,Stage,Verify guard
+
+    classDef store fill:#e8f1fb,stroke:#3b82c4,color:#0b2540
+    classDef ext fill:#f3effa,stroke:#7c5cbf,color:#24123f
+    classDef guard fill:#fdf1e6,stroke:#c77a2a,color:#3d2206
 ```
 
 ### Key Design Choices
