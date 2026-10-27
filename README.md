@@ -98,6 +98,66 @@ cell count and statistical power and must not be described as the magnitude of a
 The donor and guide correlations are also author-reported source statistics; this lightweight
 workflow audits and uses them but does not independently recompute them from raw counts.
 
+## System Design
+
+The system has two parts: a deterministic Python triage pipeline that produces a hashed artefact bundle, and a read-only Next.js workbench that serves that bundle to analysts. The bundle is the contract between them.
+
+### Requirements
+
+**Functional**
+- Audit the official CD4+ Perturb-seq summary tables, apply the registered source-QC gates, rank candidates within each condition, and summarise cross-condition overlap.
+- Let analysts explore, compare, and stress-test the ranking (reweighting), inspect a gene dossier with an evidence graph, and draft constrained finding cards.
+
+**Non-functional**
+- **Laptop scale**: avoid the 1.58 TiB cell-level matrices; work from four public summary files.
+- **Reproducibility and integrity**: pinned inputs, schema and hash audits, and a provenance manifest; the web app refuses tables whose SHA-256 differs from the manifest.
+- **Claim safety**: outputs and UI language stay within the documented inference boundary.
+
+### Architecture
+
+```text
+ Public sources (S3 bucket, authors' GitHub)            4 summary CSVs (pinned URLs + hashes)
+            │  perturbseq-triage all
+            ▼
+ sources.py ─► audit (schema, hashes, 4 donors × 3 conditions)
+            ─► analysis.py: 6 registered gates ─► within-condition percentiles
+               ─► priority_score = geometric mean(n_downstream, crossdonor_min, crossguide)
+               ─► cross-condition overlap · polarization annotation · arrayed follow-up deltas
+            ─► reporting.py / plotting.py
+            ▼
+ output/official/  tables/*.csv · figures/*.png · report.md · methods.md
+                   run_summary.json · provenance/manifest.json (SHA-256 per artefact)
+            │  web/stage-analysis.mjs (build step; refuses paths outside the app)
+            ▼
+ Next.js workbench (Vercel)
+   startup: fingerprint manifest ─► every table read verified against its SHA-256
+            ─► cached under the manifest fingerprint (no revalidation)
+   routes: / · /explore · /genes/[gene] (React Flow + ELK graph) · /compare
+           /robustness · /findings · /provenance · /api/client-errors
+```
+
+### Key Design Choices
+
+- **Summary-table route instead of a cell-level reanalysis.** It answers the registered question with megabytes instead of terabytes, at the cost of relying on author-reported statistics, which the documentation states plainly.
+- **Geometric-mean priority score.** One exceptional metric cannot hide a weak one; the score is presented as a heuristic, not a probability or effect size.
+- **Immutable, verified bundle.** The workbench is read-only and content-addressed by manifest, so what an analyst sees always matches a specific pipeline run.
+- **Exploration separated from the registered result.** `/robustness` reweighting is labelled exploratory and never overwrites the pinned ranking.
+
+### Trade-offs
+
+| Decision | Benefit | Cost |
+| --- | --- | --- |
+| Author-reported donor and guide correlations | Feasible on a laptop | Not independently recomputed from raw counts |
+| Ranking within each condition | Avoids comparing different experimental contexts | Cross-condition differences remain descriptive |
+| Bundle baked in at build time | Fast, static-like serving; strong provenance | New results require a rebuild and redeploy |
+| Cache by manifest fingerprint | No repeated hashing per request | Switching bundles requires a restart |
+
+### What to Revisit as It Grows
+
+- Add a cloud pseudobulk path (for example on a cluster or a managed notebook) to recompute concordance from raw counts.
+- Fit a formal perturbation-by-condition interaction model before making any condition-difference claims.
+- Version bundles in object storage and let the workbench switch between registered runs.
+
 ## Outputs
 
 The official run writes its artifacts under `output/official/`:
